@@ -3,7 +3,8 @@
 	"package": "com.niuhi.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"ExampleMixin"
+		"LeafletMixin",
+		"SmokeMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

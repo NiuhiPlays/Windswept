@@ -33,6 +33,10 @@ public class WindSystem {
         return windDirection;
     }
 
+    public float getWindStrength() {
+        return windStrength;
+    }
+
     private void updateWindDirection() {
         if (world == null) return; // Prevent updates if world is null
         long currentDay = world.getTimeOfDay() / 24000;
