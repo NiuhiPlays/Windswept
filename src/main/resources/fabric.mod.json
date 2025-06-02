@@ -1,0 +1,41 @@
+{
+	"schemaVersion": 1,
+	"id": "windswept",
+	"version": "${version}",
+	"name": "Windswept",
+	"description": "Clouds, Clouds and even more Clouds!",
+	"authors": [
+		"Niuhi"
+	],
+	"contact": {
+		"homepage": "https://github.com/NiuhiPlays",
+		"sources": ""
+	},
+	"license": "CC-BY-SA-4.0",
+	"icon": "assets/windswept/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.niuhi.Windswept"
+		],
+		"client": [
+			"com.niuhi.WindsweptClient"
+		]
+	},
+	"mixins": [
+		"windswept.mixins.json",
+		{
+			"config": "windswept.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.16.14",
+		"minecraft": "~1.21.5",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
