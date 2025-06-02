@@ -3,31 +3,24 @@
 	"id": "windswept",
 	"version": "${version}",
 	"name": "Windswept",
-	"description": "Clouds, Clouds and even more Clouds!",
+	"description": "This is an example description! Tell everyone what your mod is about!",
 	"authors": [
-		"Niuhi"
+		"Me!"
 	],
 	"contact": {
-		"homepage": "https://github.com/NiuhiPlays",
-		"sources": ""
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
 	},
-	"license": "CC-BY-SA-4.0",
+	"license": "CC0-1.0",
 	"icon": "assets/windswept/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
 			"com.niuhi.Windswept"
-		],
-		"client": [
-			"com.niuhi.WindsweptClient"
 		]
 	},
 	"mixins": [
-		"windswept.mixins.json",
-		{
-			"config": "windswept.client.mixins.json",
-			"environment": "client"
-		}
+		"windswept.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.16.14",
