@@ -1,5 +1,7 @@
 package com.niuhi.particle;
 
+import com.niuhi.Windswept;
+import com.niuhi.wind.WindSystem;
 import net.minecraft.client.particle.*;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.LightmapTextureManager;
@@ -13,16 +15,16 @@ import org.joml.Vector3f;
 public class WindParticle extends SpriteBillboardParticle {
     private final SpriteProvider spriteProvider;
     private float animationTimer;
-    private final Vec3d windDirection;
+    private final WindSystem windSystem;
 
     protected WindParticle(ClientWorld world, double x, double y, double z,
-                           SpriteProvider spriteProvider) {
+                           SpriteProvider spriteProvider, WindSystem windSystem) {
         super(world, x, y, z, 0, 0, 0);
         this.spriteProvider = spriteProvider;
         this.maxAge = 100 + world.random.nextInt(80);
         this.scale = 0.8f + world.random.nextFloat() * 0.4f;
         this.alpha = 0.8f;
-        this.windDirection = new Vec3d(1, 0.1, 0).normalize();
+        this.windSystem = windSystem;
         this.setSprite(spriteProvider.getSprite(0, 30));
         this.collidesWithWorld = false;
         this.gravityStrength = 0.0f;
@@ -49,21 +51,17 @@ public class WindParticle extends SpriteBillboardParticle {
         float y = (float) (this.y - camPos.y);
         float z = (float) (this.z - camPos.z);
 
-        // Calculate wind direction yaw (XZ plane)
+        Vec3d windDirection = windSystem.getWindDirection();
         float yaw = (float) MathHelper.atan2(windDirection.z, windDirection.x);
 
-        // Define quad size
         float size = this.getSize(partialTicks);
 
-        // Calculate billboard vectors aligned with camera but rotated by wind yaw
         float cosYaw = MathHelper.cos(yaw);
         float sinYaw = MathHelper.sin(yaw);
 
-        // Use camera's right and up vectors, rotated by wind yaw
         Vector3f right = new Vector3f(cosYaw, 0, -sinYaw).mul(size);
         Vector3f up = new Vector3f(0, size, 0);
 
-        // Define quad vertices
         Vector3f[] vertices = new Vector3f[]{
                 new Vector3f(x - right.x() - up.x(), y - right.y() - up.y(), z - right.z() - up.z()),
                 new Vector3f(x - right.x() + up.x(), y - right.y() + up.y(), z - right.z() + up.z()),
@@ -76,7 +74,6 @@ public class WindParticle extends SpriteBillboardParticle {
         float minV = this.getMinV();
         float maxV = this.getMaxV();
 
-        // Front face
         buffer.vertex(vertices[0].x(), vertices[0].y(), vertices[0].z())
                 .texture(minU, maxV).color(1.0f, 1.0f, 1.0f, this.alpha)
                 .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
@@ -90,7 +87,6 @@ public class WindParticle extends SpriteBillboardParticle {
                 .texture(maxU, maxV).color(1.0f, 1.0f, 1.0f, this.alpha)
                 .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
 
-        // Back face
         buffer.vertex(vertices[3].x(), vertices[3].y(), vertices[3].z())
                 .texture(maxU, maxV).color(1.0f, 1.0f, 1.0f, this.alpha)
                 .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
@@ -121,7 +117,7 @@ public class WindParticle extends SpriteBillboardParticle {
         public Particle createParticle(SimpleParticleType type, ClientWorld world,
                                        double x, double y, double z,
                                        double velocityX, double velocityY, double velocityZ) {
-            return new WindParticle(world, x, y, z, spriteProvider);
+            return new WindParticle(world, x, y, z, spriteProvider, Windswept.WIND_SYSTEM);
         }
     }
 }

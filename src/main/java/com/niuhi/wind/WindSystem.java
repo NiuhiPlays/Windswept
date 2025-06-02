@@ -10,49 +10,66 @@ import net.minecraft.world.Heightmap;
 
 public class WindSystem {
     private final ClientWorld world;
-    private final Vec3d windDirection;
+    private Vec3d windDirection;
     private final float windStrength;
     private final Random random;
     private final MinecraftClient client;
+    private long lastWindChangeDay;
 
-    public WindSystem(ClientWorld world, Vec3d windDirection, float windStrength) {
+    public WindSystem(ClientWorld world, Vec3d initialWindDirection, float windStrength) {
         this.world = world;
-        this.windDirection = windDirection.normalize();
+        this.windDirection = initialWindDirection.normalize();
         this.windStrength = windStrength;
-        this.random = world.random;
+        this.random = world != null ? world.random : Random.create();
         this.client = MinecraftClient.getInstance();
+        this.lastWindChangeDay = world != null ? world.getTimeOfDay() / 24000 : 0;
     }
 
     public ClientWorld getWorld() {
         return world;
     }
 
+    public Vec3d getWindDirection() {
+        return windDirection;
+    }
+
+    private void updateWindDirection() {
+        if (world == null) return; // Prevent updates if world is null
+        long currentDay = world.getTimeOfDay() / 24000;
+        if (currentDay > lastWindChangeDay) {
+            int directionIndex = random.nextInt(8);
+            double angle = directionIndex * Math.PI / 4; // 45-degree increments
+            double x = Math.cos(angle);
+            double z = Math.sin(angle);
+            this.windDirection = new Vec3d(x, 0.1, z).normalize();
+            this.lastWindChangeDay = currentDay;
+        }
+    }
+
     public void spawnWindParticles(BlockPos center, int radius, int particleCount) {
         for (int i = 0; i < particleCount; i++) {
-            // Random position within radius in XZ plane
             int x = center.getX() + (int) (random.nextGaussian() * radius);
             int z = center.getZ() + (int) (random.nextGaussian() * radius);
 
-            // Get ground level using heightmap
             int groundY = world.getTopY(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, x, z);
-            double y = groundY + 5 + random.nextDouble() * 3; // 1-3 blocks above ground
+            double y = groundY + 1 + random.nextDouble() * 5;
 
-            // Ensure spawn position is in air
             if (!world.getBlockState(BlockPos.ofFloored(x, y, z)).isAir()) {
-                y = groundY + 5; // Adjust to just above ground if blocked
+                y = groundY + 1;
             }
-
             client.particleManager.addParticle(WindParticleTypes.WIND, x, y, z, 0, 0, 0);
         }
     }
 
     public void tickWindArea(BlockPos center, int radius) {
-        if (world.getTime() % 20 == 0) { // Spawn every 20 ticks (once per second)
-            spawnWindParticles(center, radius, 1 + random.nextInt(15)); // Amount
+        updateWindDirection();
+        if (world.getTime() % 20 == 0) {
+            spawnWindParticles(center, radius, 1 + random.nextInt(15));
         }
     }
 
     public void setWindDirection(Vec3d newDirection) {
-        // For future expansion
+        this.windDirection = newDirection.normalize();
+        this.lastWindChangeDay = world != null ? world.getTimeOfDay() / 24000 : 0;
     }
 }
