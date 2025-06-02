@@ -9,15 +9,11 @@ import net.minecraft.util.math.random.Random;
 
 public class WindSystem {
     private final ClientWorld world;
-    private final Vec3d windDirection;
-    private final float windStrength;
     private final Random random;
     private final MinecraftClient client;
 
     public WindSystem(ClientWorld world, Vec3d windDirection, float windStrength) {
         this.world = world;
-        this.windDirection = windDirection.normalize();
-        this.windStrength = windStrength;
         this.random = world.random;
         this.client = MinecraftClient.getInstance();
     }
@@ -36,14 +32,7 @@ public class WindSystem {
                 y = center.getY() + 2;
             }
 
-            // Reduced velocity for slower movement
-            double velocityX = windDirection.x * windStrength + (random.nextGaussian() * 0.01);
-            double velocityY = windDirection.y * windStrength + (random.nextGaussian() * 0.005);
-            double velocityZ = windDirection.z * windStrength + (random.nextGaussian() * 0.01);
-
-            client.particleManager.addParticle(WindParticleTypes.WIND,
-                    x, y, z,
-                    velocityX, velocityY, velocityZ);
+            client.particleManager.addParticle(WindParticleTypes.WIND, x, y, z, 0, 0, 0);
         }
     }
 
