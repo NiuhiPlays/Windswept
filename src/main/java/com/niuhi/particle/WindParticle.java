@@ -17,37 +17,33 @@ public class WindParticle extends SpriteBillboardParticle {
 
     protected WindParticle(ClientWorld world, double x, double y, double z,
                            SpriteProvider spriteProvider) {
-        super(world, x, y, z, 0, 0, 0); // Zero velocity
+        super(world, x, y, z, 0, 0, 0);
         this.spriteProvider = spriteProvider;
-        this.maxAge = 100 + world.random.nextInt(80); // 5-9 seconds
-        this.scale = 0.6f + world.random.nextFloat() * 0.4f; // 0.6-1.0 scale
-        this.alpha = 0.7f; // Constant alpha, textures handle opacity
-        this.windDirection = new Vec3d(1, 0.1, 0).normalize(); // Fixed wind direction
+        this.maxAge = 100 + world.random.nextInt(80);
+        this.scale = 0.8f + world.random.nextFloat() * 0.4f;
+        this.alpha = 0.8f;
+        this.windDirection = new Vec3d(1, 0.1, 0).normalize();
         this.setSprite(spriteProvider.getSprite(0, 30));
         this.collidesWithWorld = false;
-        this.gravityStrength = 0.0f; // No gravity to prevent jitter
+        this.gravityStrength = 0.0f;
     }
 
     @Override
     public void tick() {
-        // Update animation
-        this.animationTimer += 0.3f; // Slightly faster animation
-        int frameIndex = ((int) this.animationTimer) % 31; // Cycle through 31 textures
+        this.animationTimer += 0.3f;
+        int frameIndex = ((int) this.animationTimer) % 31;
         this.setSprite(spriteProvider.getSprite(frameIndex, 30));
 
-        // Age the particle
         if (this.age++ >= this.maxAge) {
             this.markDead();
         }
 
-        // Subtle scale changes
         this.scale += (float) (random.nextGaussian() * 0.001);
-        this.scale = Math.max(0.4f, Math.min(0.8f, this.scale));
+        this.scale = Math.max(0.6f, Math.min(1.0f, this.scale));
     }
 
     @Override
     public void render(VertexConsumer buffer, Camera camera, float partialTicks) {
-        // Get camera and particle position
         Vec3d camPos = camera.getPos();
         float x = (float) (this.x - camPos.x);
         float y = (float) (this.y - camPos.y);
@@ -55,33 +51,32 @@ public class WindParticle extends SpriteBillboardParticle {
 
         // Calculate wind direction yaw (XZ plane)
         float yaw = (float) MathHelper.atan2(windDirection.z, windDirection.x);
-        float cosYaw = MathHelper.cos(-yaw - (float) Math.PI / 2);
-        float sinYaw = MathHelper.sin(-yaw - (float) Math.PI / 2);
 
-        // Get camera's up and right vectors for billboarding
-        Vector3f right = new Vector3f(cosYaw, 0, sinYaw).mul(this.getSize(partialTicks));
-        Vector3f up = new Vector3f(0, this.getSize(partialTicks), 0);
+        // Define quad size
+        float size = this.getSize(partialTicks);
 
-        // Define quad vertices (billboard aligned to camera, rotated by wind yaw)
+        // Calculate billboard vectors aligned with camera but rotated by wind yaw
+        float cosYaw = MathHelper.cos(yaw);
+        float sinYaw = MathHelper.sin(yaw);
+
+        // Use camera's right and up vectors, rotated by wind yaw
+        Vector3f right = new Vector3f(cosYaw, 0, -sinYaw).mul(size);
+        Vector3f up = new Vector3f(0, size, 0);
+
+        // Define quad vertices
         Vector3f[] vertices = new Vector3f[]{
-                new Vector3f().sub(right).sub(up), // Bottom-left
-                new Vector3f().sub(right).add(up), // Top-left
-                new Vector3f().add(right).add(up), // Top-right
-                new Vector3f().add(right).sub(up)  // Bottom-right
+                new Vector3f(x - right.x() - up.x(), y - right.y() - up.y(), z - right.z() - up.z()),
+                new Vector3f(x - right.x() + up.x(), y - right.y() + up.y(), z - right.z() + up.z()),
+                new Vector3f(x + right.x() + up.x(), y + right.y() + up.y(), z + right.z() + up.z()),
+                new Vector3f(x + right.x() - up.x(), y + right.y() - up.y(), z + right.z() - up.z())
         };
 
-        // Translate vertices to particle position
-        for (Vector3f vertex : vertices) {
-            vertex.add(x, y, z);
-        }
-
-        // Get sprite UV coordinates
         float minU = this.getMinU();
         float maxU = this.getMaxU();
         float minV = this.getMinV();
         float maxV = this.getMaxV();
 
-        // Draw quad with full brightness
+        // Front face
         buffer.vertex(vertices[0].x(), vertices[0].y(), vertices[0].z())
                 .texture(minU, maxV).color(1.0f, 1.0f, 1.0f, this.alpha)
                 .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
@@ -93,6 +88,20 @@ public class WindParticle extends SpriteBillboardParticle {
                 .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
         buffer.vertex(vertices[3].x(), vertices[3].y(), vertices[3].z())
                 .texture(maxU, maxV).color(1.0f, 1.0f, 1.0f, this.alpha)
+                .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
+
+        // Back face
+        buffer.vertex(vertices[3].x(), vertices[3].y(), vertices[3].z())
+                .texture(maxU, maxV).color(1.0f, 1.0f, 1.0f, this.alpha)
+                .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
+        buffer.vertex(vertices[2].x(), vertices[2].y(), vertices[2].z())
+                .texture(maxU, minV).color(1.0f, 1.0f, 1.0f, this.alpha)
+                .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
+        buffer.vertex(vertices[1].x(), vertices[1].y(), vertices[1].z())
+                .texture(minU, minV).color(1.0f, 1.0f, 1.0f, this.alpha)
+                .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
+        buffer.vertex(vertices[0].x(), vertices[0].y(), vertices[0].z())
+                .texture(minU, maxV).color(1.0f, 1.0f, 1.0f, this.alpha)
                 .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
     }
 
