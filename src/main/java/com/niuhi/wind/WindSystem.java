@@ -22,36 +22,38 @@ public class WindSystem {
         this.client = MinecraftClient.getInstance();
     }
 
-    public void spawnWindParticles(BlockPos center, int radius, int particleCount) {
-        if (!world.isClient || client.player == null) return; // Only spawn on client side
+    public ClientWorld getWorld() {
+        return world;
+    }
 
+    public void spawnWindParticles(BlockPos center, int radius, int particleCount) {
         for (int i = 0; i < particleCount; i++) {
-            // Random position within radius
             double x = center.getX() + (random.nextGaussian() * radius);
-            double y = center.getY() + (random.nextGaussian() * radius * 0.5); // Less vertical spread
+            double y = center.getY() + 2 + random.nextDouble() * 3; // Spawn 2-5 blocks above center
             double z = center.getZ() + (random.nextGaussian() * radius);
 
-            // Initial velocity with some randomness
+            if (!world.getBlockState(BlockPos.ofFloored(x, y, z)).isAir()) {
+                y = center.getY() + 2;
+            }
+
+            // Reduced velocity for slower movement
             double velocityX = windDirection.x * windStrength + (random.nextGaussian() * 0.01);
             double velocityY = windDirection.y * windStrength + (random.nextGaussian() * 0.005);
             double velocityZ = windDirection.z * windStrength + (random.nextGaussian() * 0.01);
 
-            // Spawn the particle using the particle manager
             client.particleManager.addParticle(WindParticleTypes.WIND,
                     x, y, z,
                     velocityX, velocityY, velocityZ);
         }
     }
 
-    // Continuous wind effect in an area
     public void tickWindArea(BlockPos center, int radius) {
-        if (world.getTime() % 4 == 0) { // Spawn every 4 ticks (5 times per second)
-            spawnWindParticles(center, radius, 2 + random.nextInt(4));
+        if (world.getTime() % 20 == 0) { // Spawn every 20 ticks (once per second)
+            spawnWindParticles(center, radius, 1 + random.nextInt(2)); // 1-2 particles
         }
     }
 
-    // Set new wind direction (for future expansion)
     public void setWindDirection(Vec3d newDirection) {
-        // This will be used when you expand the system
+        // For future expansion
     }
 }

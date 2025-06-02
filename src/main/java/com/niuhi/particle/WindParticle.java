@@ -17,43 +17,42 @@ public class WindParticle extends SpriteBillboardParticle {
         super(world, x, y, z, velocityX, velocityY, velocityZ);
 
         this.spriteProvider = spriteProvider;
-        this.maxAge = 60 + world.random.nextInt(40); // 3-5 seconds at 20 TPS
-        this.scale = 0.3f + world.random.nextFloat() * 0.4f; // Varied sizes
-        this.alpha = 0.6f + world.random.nextFloat() * 0.3f;
+        this.maxAge = 100 + world.random.nextInt(80); // 5-9 seconds
+        this.scale = 0.6f + world.random.nextFloat() * 0.4f; // Smaller, subtler size
+        this.alpha = 0.5f + world.random.nextFloat() * 0.3f; // Slightly less opaque
 
-        // Wind properties
-        this.windDirection = new Vec3d(1, 0, 0); // Default: East direction
-        this.windStrength = 0.02f + world.random.nextFloat() * 0.03f;
-        this.animationTimer = 0;
+        this.windDirection = new Vec3d(1, 0.1, 0);
+        this.windStrength = 0.02f + world.random.nextFloat() * 0.02f; // Slower movement
 
-        // Set initial sprite
-        this.setSprite(spriteProvider.getSprite(0, 30)); // First frame
-
-        // Gravity and physics
-        this.gravityStrength = 0.0f; // Wind particles float
+        this.setSprite(spriteProvider.getSprite(0, 30));
+        this.gravityStrength = -0.005f; // Gentle upward drift
         this.collidesWithWorld = false;
     }
 
     @Override
     public void tick() {
-        super.tick();
-
-        // Update animation
-        this.animationTimer += 1.0f;
-        int frameIndex = (int) (this.animationTimer * 0.5f) % 31; // Cycle through 31 textures
+        this.animationTimer += 0.4f; // Slower animation to reduce flickering
+        int frameIndex = ((int) this.animationTimer) % 31; // Cycle through 31 textures
         this.setSprite(spriteProvider.getSprite(frameIndex, 30));
 
-        // Apply wind movement
+        // Slower movement with less randomness
         this.velocityX = windDirection.x * windStrength + (random.nextGaussian() * 0.005);
-        this.velocityY = windDirection.y * windStrength + (random.nextGaussian() * 0.002);
+        this.velocityY = windDirection.y * windStrength + (random.nextGaussian() * 0.003);
         this.velocityZ = windDirection.z * windStrength + (random.nextGaussian() * 0.005);
 
-        // Fade out over time
-        this.alpha = Math.max(0, this.alpha - (1.0f / this.maxAge));
+        this.move(this.velocityX, this.velocityY, this.velocityZ);
 
-        // Scale changes for wind effect
+        if (this.age++ >= this.maxAge) {
+            this.markDead();
+        }
+
+        // Gradual fade-out
+        float ageRatio = (float) this.age / (float) this.maxAge;
+        this.alpha = Math.max(0.2f, 0.8f - (ageRatio * 0.6f));
+
+        // Subtle scale changes
         this.scale += (float) (random.nextGaussian() * 0.001);
-        this.scale = Math.max(0.1f, Math.min(1.0f, this.scale));
+        this.scale = Math.max(0.4f, Math.min(0.8f, this.scale));
     }
 
     @Override
@@ -61,7 +60,11 @@ public class WindParticle extends SpriteBillboardParticle {
         return ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT;
     }
 
-    // Factory class for creating wind particles
+    @Override
+    public int getBrightness(float tint) {
+        return 240; // Full brightness
+    }
+
     public static class Factory implements ParticleFactory<SimpleParticleType> {
         private final SpriteProvider spriteProvider;
 
