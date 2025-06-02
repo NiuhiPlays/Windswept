@@ -25,7 +25,7 @@ public class WindParticle extends SpriteBillboardParticle {
         this.windDirection = new Vec3d(1, 0.1, 0).normalize(); // Fixed wind direction
         this.setSprite(spriteProvider.getSprite(0, 30));
         this.collidesWithWorld = false;
-        this.gravityStrength = 0.0f; // No gravity to prevent Y-axis jitter
+        this.gravityStrength = 0.0f; // No gravity to prevent jitter
     }
 
     @Override
@@ -53,18 +53,21 @@ public class WindParticle extends SpriteBillboardParticle {
         float y = (float) (this.y - camPos.y);
         float z = (float) (this.z - camPos.z);
 
-        // Calculate rotation to align with wind direction (XZ plane)
+        // Calculate wind direction yaw (XZ plane)
         float yaw = (float) MathHelper.atan2(windDirection.z, windDirection.x);
         float cosYaw = MathHelper.cos(-yaw - (float) Math.PI / 2);
         float sinYaw = MathHelper.sin(-yaw - (float) Math.PI / 2);
 
-        // Define quad vertices (size based on scale)
-        float size = this.getSize(partialTicks);
+        // Get camera's up and right vectors for billboarding
+        Vector3f right = new Vector3f(cosYaw, 0, sinYaw).mul(this.getSize(partialTicks));
+        Vector3f up = new Vector3f(0, this.getSize(partialTicks), 0);
+
+        // Define quad vertices (billboard aligned to camera, rotated by wind yaw)
         Vector3f[] vertices = new Vector3f[]{
-                new Vector3f(-size * cosYaw - size * sinYaw, 0, -size * sinYaw + size * cosYaw),
-                new Vector3f(-size * cosYaw + size * sinYaw, 0, -size * sinYaw - size * cosYaw),
-                new Vector3f(size * cosYaw + size * sinYaw, 0, size * sinYaw - size * cosYaw),
-                new Vector3f(size * cosYaw - size * sinYaw, 0, size * sinYaw + size * cosYaw)
+                new Vector3f().sub(right).sub(up), // Bottom-left
+                new Vector3f().sub(right).add(up), // Top-left
+                new Vector3f().add(right).add(up), // Top-right
+                new Vector3f().add(right).sub(up)  // Bottom-right
         };
 
         // Translate vertices to particle position

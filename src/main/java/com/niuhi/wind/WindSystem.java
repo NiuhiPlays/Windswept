@@ -25,7 +25,7 @@ public class WindSystem {
     public void spawnWindParticles(BlockPos center, int radius, int particleCount) {
         for (int i = 0; i < particleCount; i++) {
             double x = center.getX() + (random.nextGaussian() * radius);
-            double y = center.getY() + 2 + random.nextDouble() * 3; // Spawn 2-5 blocks above center
+            double y = center.getY() + 10 + random.nextDouble() * 2; // Spawns from ground level
             double z = center.getZ() + (random.nextGaussian() * radius);
 
             if (!world.getBlockState(BlockPos.ofFloored(x, y, z)).isAir()) {
@@ -38,7 +38,7 @@ public class WindSystem {
 
     public void tickWindArea(BlockPos center, int radius) {
         if (world.getTime() % 20 == 0) { // Spawn every 20 ticks (once per second)
-            spawnWindParticles(center, radius, 1 + random.nextInt(2)); // 1-2 particles
+            spawnWindParticles(center, radius, 1 + random.nextInt(25)); // Particle Amount
         }
     }
 
