@@ -3,13 +3,13 @@
 	"id": "windswept",
 	"version": "${version}",
 	"name": "Windswept",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Wind, Clouds and stuff! Just a small visual mod.",
 	"authors": [
-		"Me!"
+		"Niuhi"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"homepage": "",
+		"sources": ""
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/windswept/icon.png",
