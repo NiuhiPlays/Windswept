@@ -28,7 +28,7 @@ public abstract class LeafletMixin extends SpriteBillboardParticle {
 			WindSystem windSystem = Windswept.WIND_SYSTEM;
 			Vec3d windDirection = windSystem.getWindDirection();
 			float windStrength = windSystem.getWindStrength();
-			float baseStrength = 0.003f; // Subtle effect for leaves
+			float baseStrength = 0.001f; // Subtle effect for leaves
 			this.velocityX += windDirection.x * windStrength * baseStrength;
 			this.velocityY += windDirection.y * windStrength * baseStrength;
 			this.velocityZ += -windDirection.z * windStrength * baseStrength; // Negate Z to match WindParticle render
