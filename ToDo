@@ -25,7 +25,10 @@ All just for you! No server install needed!
         Direction
     Make Cloud Looks configurable
     Make placeholder Compatibility
-
+//ToDo - Make Weather React to Wind
+    Rain
+    Snow
+    Add Sandstorm
 //ToDo - Make Clouds react to Wind
 //ToDo - Make Clouds react to Mountains
 //ToDo - Add a few more clouds
