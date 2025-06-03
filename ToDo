@@ -32,8 +32,20 @@ All just for you! No server install needed!
 //ToDo - Make Clouds react to Wind
 //ToDo - Make Clouds react to Mountains
 //ToDo - Add a few more clouds
-//ToDo - Make Wind react to biomes and environments
-//ToDo - Make Clouds react to biomes and environments
+//ToDo - Make Wind react to biomes
+    Add 3 wind speeds
+    Biome based Wind Speeds
+//ToDo - Make Clouds react to biomes
+
+//ToDo - Make foliage react to wind
+    Grass
+    Flowers
+
+//ToDo - Water Particles, like Effective / Particular
+    Waterfall
+    Item/Entity
+    Wakes
+    Tidals
 
 //ToDo - Make Own Wind Particle Textures
 //ToDo - Replace Wind Particles with own Textures
