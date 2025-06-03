@@ -1,4 +1,4 @@
-package com.niuhi.particle;
+package com.niuhi.particle.wind;
 
 import com.niuhi.Windswept;
 import com.niuhi.wind.WindSystem;

@@ -1,7 +1,7 @@
 package com.niuhi;
 
-import com.niuhi.particle.WindParticle;
-import com.niuhi.particle.WindParticleTypes;
+import com.niuhi.particle.wind.WindParticle;
+import com.niuhi.particle.wind.WindParticleTypes;
 import com.niuhi.wind.WindSystem;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;

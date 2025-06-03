@@ -1,6 +1,6 @@
 package com.niuhi.wind;
 
-import com.niuhi.particle.WindParticleTypes;
+import com.niuhi.particle.wind.WindParticleTypes;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
