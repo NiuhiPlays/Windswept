@@ -1,5 +1,7 @@
 package com.niuhi;
 
+import com.niuhi.particle.water.*;
+import com.niuhi.particle.water.WaterParticleTypes;
 import com.niuhi.particle.wind.WindParticle;
 import com.niuhi.particle.wind.WindParticleTypes;
 import com.niuhi.wind.WindSystem;
@@ -16,7 +18,16 @@ public class Windswept implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		LOGGER.info("Blowing in the Clouds and stuff!");
+
+		// Wind Particles
 		WindParticleTypes.registerParticles();
 		ParticleFactoryRegistry.getInstance().register(WindParticleTypes.WIND, WindParticle.Factory::new);
+
+		// Water Particles
+		WaterParticleTypes.registerParticles();
+		ParticleFactoryRegistry.getInstance().register(WaterParticleTypes.CASCADE, CascadeParticle.Factory::new);
+		ParticleFactoryRegistry.getInstance().register(WaterParticleTypes.TIDE_SPLASH, TideSplashParticle.Factory::new);
+		ParticleFactoryRegistry.getInstance().register(WaterParticleTypes.RIPPLE, RippleParticle.Factory::new);
+		ParticleFactoryRegistry.getInstance().register(WaterParticleTypes.SPLASH, SplashParticle.Factory::new);
 	}
 }
