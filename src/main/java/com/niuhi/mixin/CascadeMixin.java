@@ -29,7 +29,7 @@ public abstract class CascadeMixin extends SpriteBillboardParticle {
 
             // Apply wind with realistic water droplet physics
             this.velocityX += windDirection.x * windStrength * baseStrength;
-            this.velocityY += windDirection.y * windStrength * baseStrength * 0.5f; // Less vertical effect
+            this.velocityY += windDirection.y * windStrength * baseStrength;
             this.velocityZ += -windDirection.z * windStrength * baseStrength; // Negate Z to match your system
 
             // Optional: Add some drag effect in strong winds

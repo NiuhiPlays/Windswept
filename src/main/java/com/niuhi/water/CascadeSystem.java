@@ -1,6 +1,7 @@
 package com.niuhi.water;
 
 import com.niuhi.particle.water.WaterParticleTypes;
+import com.niuhi.water.culling.ParticleCulling;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
@@ -47,10 +48,13 @@ public class CascadeSystem {
                                 // Get spawn position at the impact point
                                 Vec3d spawnPos = getImpactSpawnPosition(world, impactPos, openSides);
 
-                                // Spawn particle with minimal initial velocity - wind will be applied via mixin
-                                world.addParticleClient(WaterParticleTypes.CASCADE,
-                                        spawnPos.x, spawnPos.y, spawnPos.z,
-                                        scale, 0.0, 0.0);
+                                // Apply frustum culling - only spawn if in player's view
+                                if (ParticleCulling.shouldRender(spawnPos, 2.0, 64.0)) {
+                                    // Spawn particle with minimal initial velocity - wind will be applied via mixin
+                                    world.addParticleClient(WaterParticleTypes.CASCADE,
+                                            spawnPos.x, spawnPos.y, spawnPos.z,
+                                            scale, 0.0, 0.0);
+                                }
                             }
                         }
                     }
