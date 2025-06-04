@@ -1,13 +1,13 @@
 {
-	"required": true,
-	"package": "com.niuhi.mixin",
-	"compatibilityLevel": "JAVA_21",
-	"mixins": [
-		"LeafletMixin",
-		"SmokeMixin",
-		"CascadeMixin"
-	],
-	"injectors": {
-		"defaultRequire": 1
+  "required": true,
+  "package": "com.niuhi.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "CascadeMixin",
+    "LeafletMixin",
+    "SmokeMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
 	}
 }
