@@ -14,46 +14,35 @@ import java.util.List;
 public class CascadeSystem {
 
     public static void register() {
-        // Register client tick event for cascade particle spawning
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             World world = client.world;
             if (world == null || client.player == null) return;
 
-            // Limit checks to a 32 radius around the player
             BlockPos playerPos = client.player.getBlockPos();
             int radius = 32;
             for (int x = -radius; x <= radius; x++) {
                 for (int y = -radius; y <= radius; y++) {
                     for (int z = -radius; z <= radius; z++) {
                         BlockPos pos = playerPos.add(x, y, z);
-                        // Check if this is a waterfall hitting a pond
                         BlockPos impactPos = findWaterfallImpact(world, pos);
                         if (impactPos != null) {
-                            // Get open sides at the impact point
                             List<BlockPos> openSides = getOpenSides(world, impactPos);
-
-                            // Calculate spawn chance based on waterfall intensity and pond characteristics
                             float baseSpawnChance = 0.15f;
                             float waterfallIntensity = getWaterfallIntensity(world, pos);
                             float pondSize = getPondSizeMultiplier(world, impactPos);
-
                             float spawnChance = baseSpawnChance * waterfallIntensity * pondSize * (1 + openSides.size() * 0.15f);
                             spawnChance = Math.min(spawnChance, 0.6f);
 
                             if (world.random.nextFloat() < spawnChance) {
-                                // Calculate particle scale based on waterfall and pond characteristics
                                 float scale = 0.3f + (waterfallIntensity - 1.0f) * 0.2f + (openSides.size() * 0.08f);
                                 scale = Math.min(scale, 1.2f);
-
-                                // Get spawn position at the impact point
-                                Vec3d spawnPos = getImpactSpawnPosition(world, impactPos, openSides);
-
-                                // Apply frustum culling - only spawn if in player's view
-                                if (ParticleCulling.shouldRender(spawnPos, 2.0, 64.0)) {
-                                    // Spawn particle with minimal initial velocity - wind will be applied via mixin
-                                    world.addParticleClient(WaterParticleTypes.CASCADE,
-                                            spawnPos.x, spawnPos.y, spawnPos.z,
-                                            scale, 0.0, 0.0);
+                                List<Vec3d> spawnPositions = getImpactSpawnPositions(world, impactPos, openSides);
+                                for (Vec3d spawnPos : spawnPositions) {
+                                    if (ParticleCulling.shouldRender(spawnPos, 2.0, 64.0)) {
+                                        world.addParticleClient(WaterParticleTypes.CASCADE,
+                                                spawnPos.x, spawnPos.y, spawnPos.z,
+                                                scale, 0.0, 0.0);
+                                    }
                                 }
                             }
                         }
@@ -191,47 +180,55 @@ public class CascadeSystem {
         return Math.min(1.0f + (stillWaterBlocks * 0.02f), 1.8f);
     }
 
-    // Get spawn position at the impact point (above and around pond surface)
-    private static Vec3d getImpactSpawnPosition(World world, BlockPos impactPos, List<BlockPos> openSides) {
+    // Renamed to getImpactSpawnPositions to return multiple positions
+    private static List<Vec3d> getImpactSpawnPositions(World world, BlockPos impactPos, List<BlockPos> openSides) {
+        List<Vec3d> spawnPositions = new ArrayList<>();
         double baseX = impactPos.getX();
-        double baseY = impactPos.getY() + 1.1; // Spawn above the water surface
+        double baseY = impactPos.getY() + 1.0; // Spawn above the water surface
         double baseZ = impactPos.getZ();
 
         // Add vertical randomness to create spray effect
         double verticalOffset = world.random.nextDouble() * 0.3; // 0.0 to 0.3 blocks higher
         baseY += verticalOffset;
 
-        // If there are open sides, bias towards them for more realistic spray patterns
-        if (!openSides.isEmpty() && world.random.nextFloat() < 0.8f) {
-            BlockPos openSide = openSides.get(world.random.nextInt(openSides.size()));
-
-            // Calculate direction towards open side (stronger bias for spray effect)
-            double dirX = (openSide.getX() - impactPos.getX()) * 0.6;
-            double dirZ = (openSide.getZ() - impactPos.getZ()) * 0.6;
-
-            // Add randomness around the biased position
-            double offsetX = dirX + (world.random.nextDouble() - 0.5) * 0.4;
-            double offsetZ = dirZ + (world.random.nextDouble() - 0.5) * 0.4;
-
-            // Allow particles to spawn outside the water block for spray effect
-            offsetX = Math.max(-0.8, Math.min(0.8, offsetX));
-            offsetZ = Math.max(-0.8, Math.min(0.8, offsetZ));
-
-            return new Vec3d(baseX + 0.5 + offsetX, baseY, baseZ + 0.5 + offsetZ);
-        } else {
-            // Random distribution around the pond surface (not just on it)
-            double offsetX = (world.random.nextDouble() - 0.5) * 1.2; // Wider spread
-            double offsetZ = (world.random.nextDouble() - 0.5) * 1.2;
-
-            return new Vec3d(baseX + 0.5 + offsetX, baseY, baseZ + 0.5 + offsetZ);
+        // If no open sides, skip to avoid spawning inside water
+        if (openSides.isEmpty()) {
+            return spawnPositions; // Empty list, no particles
         }
+
+        // Spawn one particle per open side in 8 directions
+        for (BlockPos openSide : openSides) {
+            // Calculate direction vector to open side
+            double dirX = openSide.getX() - impactPos.getX();
+            double dirZ = openSide.getZ() - impactPos.getZ();
+
+            // Normalize diagonal directions to keep within block bounds
+            double length = Math.sqrt(dirX * dirX + dirZ * dirZ);
+            double offsetScale = (length > 1.0) ? 0.45 : 0.5;
+            dirX *= offsetScale / length;
+            dirZ *= offsetScale / length;
+
+            // Add small randomness along the edge
+            double offsetX = dirX + (world.random.nextDouble() - 0.5) * 0.2; // ±0.2 variation
+            double offsetZ = dirZ + (world.random.nextDouble() - 0.5) * 0.2;
+
+            // Clamp to stay near the edge
+            offsetX = Math.max(-0.6, Math.min(0.6, offsetX));
+            offsetZ = Math.max(-0.6, Math.min(0.6, offsetZ));
+
+            spawnPositions.add(new Vec3d(baseX + 0.5 + offsetX, baseY, baseZ + 0.5 + offsetZ));
+        }
+
+        return spawnPositions;
     }
 
-    // Get list of open sides (air or non-solid blocks) around a block
+    // Updated getOpenSides to check 8 cardinal directions
     private static List<BlockPos> getOpenSides(World world, BlockPos pos) {
         List<BlockPos> openSides = new ArrayList<>();
         BlockPos[] sides = {
-                pos.north(), pos.south(), pos.east(), pos.west()
+                pos.north(), pos.south(), pos.east(), pos.west(),
+                pos.north().east(), pos.north().west(),
+                pos.south().east(), pos.south().west()
         };
 
         for (BlockPos side : sides) {
@@ -240,7 +237,6 @@ public class CascadeSystem {
                 openSides.add(side);
             }
         }
-
         return openSides;
     }
 }
