@@ -15,7 +15,7 @@ public class Windswept implements ModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static WindSystem WIND_SYSTEM = null; // Initialize to null, set in WindsweptClient
 
-	@Override
+    @Override
 	public void onInitialize() {
 		LOGGER.info("Blowing in the Clouds and stuff!");
 
@@ -29,5 +29,7 @@ public class Windswept implements ModInitializer {
 		ParticleFactoryRegistry.getInstance().register(WaterParticleTypes.TIDE_SPLASH, TideSplashParticle.Factory::new);
 		ParticleFactoryRegistry.getInstance().register(WaterParticleTypes.RIPPLE, RippleParticle.Factory::new);
 		ParticleFactoryRegistry.getInstance().register(WaterParticleTypes.SPLASH, SplashParticle.Factory::new);
+
+		//Clouds
 	}
 }
