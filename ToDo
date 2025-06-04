@@ -1,9 +1,14 @@
 Windswept Description
 
-Overhauling Minecraft's clouds, making them look more appealing and adding more depth in the Clouds.
-This will be done by making them more thick, more fluffy, more layers and especially more Cloud Types!!
+Overhauling Minecraft's Visuals, making minecraft more cosy.
 
-Also adding a wind system that will add some small visuals. And clouds that react to the wind.
+Features like:
+
+Wind and Wind Reactions
+Water based effects, Cascades, Wakes, Tides and ripples
+Clouds Overhaul
+Weather Overhaul
+Ambient sounds
 
 All just for you! No server install needed!
 
@@ -24,7 +29,7 @@ All just for you! No server install needed!
         Strength
         Direction
     Make Cloud Looks configurable
-    Make placeholder Compatibility
+    Make mod Compatibility
 //ToDo - Make Weather React to Wind
     Rain
     Snow
@@ -41,11 +46,18 @@ All just for you! No server install needed!
     Grass
     Flowers
 
+//DONE- Water Particles, like Effective / Particular
+    Waterfall / Cascades
+
 //ToDo - Water Particles, like Effective / Particular
-    Waterfall
     Item/Entity
     Wakes
     Tidals
+
+//ToDo - Add sounds to Particles
+    Wind
+    Water
+    Foliage
 
 //ToDo - Make Own Wind Particle Textures
 //ToDo - Replace Wind Particles with own Textures
