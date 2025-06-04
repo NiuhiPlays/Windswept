@@ -27,18 +27,20 @@ public class CascadeSystem {
                         BlockPos impactPos = findWaterfallImpact(world, pos);
                         if (impactPos != null) {
                             List<BlockPos> openSides = getOpenSides(world, impactPos);
-                            float baseSpawnChance = 0.15f;
+                            float baseSpawnChance = 0.05f; // Reduced from 0.10f to lower spawn frequency
                             float waterfallIntensity = getWaterfallIntensity(world, pos);
                             float pondSize = getPondSizeMultiplier(world, impactPos);
-                            float spawnChance = baseSpawnChance * waterfallIntensity * pondSize * (1 + openSides.size() * 0.15f);
-                            spawnChance = Math.min(spawnChance, 0.6f);
+                            float spawnChance = baseSpawnChance * waterfallIntensity * pondSize * (1 + openSides.size() * 0.10f); // Reduced openSides multiplier from 0.15f
+                            spawnChance = Math.min(spawnChance, 0.3f); // Reduced max spawn chance from 0.6f
 
                             if (world.random.nextFloat() < spawnChance) {
-                                float scale = 0.3f + (waterfallIntensity - 1.0f) * 0.2f + (openSides.size() * 0.08f);
-                                scale = Math.min(scale, 1.2f);
+                                float scale = 0.3f + (waterfallIntensity - 1.0f) * 0.15f + (openSides.size() * 0.05f); // Reduced scale modifiers
+                                scale = Math.min(scale, 1.0f); // Reduced max scale from 1.2f
                                 List<Vec3d> spawnPositions = getImpactSpawnPositions(world, impactPos, openSides);
-                                for (Vec3d spawnPos : spawnPositions) {
-                                    if (ParticleCulling.shouldRender(spawnPos, 2.0, 64.0)) {
+                                int maxParticlesPerSpawn = 2 + world.random.nextInt(3); // Limit to 2–4 particles per spawn event
+                                for (int i = 0; i < Math.min(spawnPositions.size(), maxParticlesPerSpawn); i++) {
+                                    Vec3d spawnPos = spawnPositions.get(i);
+                                    if (ParticleCulling.shouldRender(spawnPos, 2.0, 128.0)) {
                                         world.addParticleClient(WaterParticleTypes.CASCADE,
                                                 spawnPos.x, spawnPos.y, spawnPos.z,
                                                 scale, 0.0, 0.0);
@@ -177,7 +179,7 @@ public class CascadeSystem {
         }
 
         // Larger ponds get higher multipliers (more spray)
-        return Math.min(1.0f + (stillWaterBlocks * 0.02f), 1.8f);
+        return Math.min(1.0f + (stillWaterBlocks * 0.1f), 1.8f);
     }
 
     // Renamed to getImpactSpawnPositions to return multiple positions
@@ -188,7 +190,7 @@ public class CascadeSystem {
         double baseZ = impactPos.getZ();
 
         // Add vertical randomness to create spray effect
-        double verticalOffset = world.random.nextDouble() * 0.3; // 0.0 to 0.3 blocks higher
+        double verticalOffset = world.random.nextDouble() * 0.4; // 0.0 to 0.3 blocks higher
         baseY += verticalOffset;
 
         // If no open sides, skip to avoid spawning inside water
@@ -209,12 +211,12 @@ public class CascadeSystem {
             dirZ *= offsetScale / length;
 
             // Add small randomness along the edge
-            double offsetX = dirX + (world.random.nextDouble() - 0.5) * 0.2; // ±0.2 variation
-            double offsetZ = dirZ + (world.random.nextDouble() - 0.5) * 0.2;
+            double offsetX = dirX + (world.random.nextDouble() - 0.5) * 0.3; // ±0.2 variation
+            double offsetZ = dirZ + (world.random.nextDouble() - 0.5) * 0.3;
 
             // Clamp to stay near the edge
-            offsetX = Math.max(-0.6, Math.min(0.6, offsetX));
-            offsetZ = Math.max(-0.6, Math.min(0.6, offsetZ));
+            offsetX = Math.max(-0.75, Math.min(0.75, offsetX));
+            offsetZ = Math.max(-0.75, Math.min(0.75, offsetZ));
 
             spawnPositions.add(new Vec3d(baseX + 0.5 + offsetX, baseY, baseZ + 0.5 + offsetZ));
         }

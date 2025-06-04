@@ -11,7 +11,7 @@ public class CascadeParticle extends SpriteBillboardParticle {
     protected CascadeParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider) {
         super(world, x, y, z);
         this.spriteProvider = spriteProvider;
-        this.maxAge = 60 + random.nextInt(20); // 60-80 ticks
+        this.maxAge = 100 + random.nextInt(40); // 60-80 ticks
         this.scale = 0.4f + random.nextFloat() * 0.3f; // Variable size
         this.alpha = 0.8f;
         this.animationTimer = 0.0f;
