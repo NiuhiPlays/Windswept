@@ -6,22 +6,33 @@ import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.SimpleParticleType;
+import net.minecraft.util.math.BlockPos;
 import org.joml.Vector3f;
 
 public class RippleParticle extends SpriteBillboardParticle {
     private final SpriteProvider spriteProvider;
     private float animationTimer;
     private final float sizeMultiplier;
+    private final float animationSpeed;
 
-    protected RippleParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider, double sizeMultiplier) {
+    protected RippleParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider,
+                             double sizeMultiplier, double maxAge, double animationSpeed) {
         super(world, x, y, z);
         this.spriteProvider = spriteProvider;
         this.sizeMultiplier = (float) Math.max(0.5, Math.min(2.0, sizeMultiplier)); // Clamp between 0.5x and 2x
         this.maxAge = (int) (20 * this.sizeMultiplier); // Scale lifespan (10-40 ticks)
-        this.scale = 0.9f * this.sizeMultiplier; // Scale initial size
+        this.scale = 0.8f * this.sizeMultiplier; // Scale initial size
         this.velocityY = 0.0; // Ripples stay on water surface
         this.alpha = 0.8f;
         this.animationTimer = 0.0f;
+        this.animationSpeed = (float) animationSpeed; // Animation speed from parameter
+
+
+        // Set color based on biome's water color
+        int waterColor = world.getBiome(new BlockPos((int)x, (int)y, (int)z)).value().getWaterColor();
+        this.red = ((waterColor >> 16) & 0xFF) / 255.0f; // Extract red component
+        this.green = ((waterColor >> 8) & 0xFF) / 255.0f; // Extract green component
+        this.blue = (waterColor & 0xFF) / 255.0f; // Extract blue component
 
         // Set initial sprite frame (7 frames, 0-6)
         this.setSprite(spriteProvider.getSprite(0, 6));
@@ -32,11 +43,11 @@ public class RippleParticle extends SpriteBillboardParticle {
         super.tick();
 
         // Animate sprite (7 frames, 0-6)
-        this.animationTimer += 0.3f * sizeMultiplier; // Faster animation for larger ripples
+        this.animationTimer += this.animationSpeed; // Use group-specific animation speed
         int frameIndex = ((int) this.animationTimer) % 7; // Cycle through 7 frames
         this.setSprite(spriteProvider.getSprite(frameIndex, 6));
 
-        this.scale += 0.02f * sizeMultiplier; // Faster expansion for larger ripples
+        this.scale += 0.02f * this.sizeMultiplier; // Faster expansion for larger ripples
         this.alpha = 0.8f - ((float) this.age / this.maxAge) * 0.8f; // Fade out
     }
 
@@ -95,7 +106,7 @@ public class RippleParticle extends SpriteBillboardParticle {
         public Particle createParticle(SimpleParticleType type, ClientWorld world,
                                        double x, double y, double z,
                                        double velocityX, double velocityY, double velocityZ) {
-            return new RippleParticle(world, x, y, z, spriteProvider, velocityX); // Pass velocityX as sizeMultiplier
+            return new RippleParticle(world, x, y, z, spriteProvider, velocityX, velocityY, velocityZ); // Pass velocityX as sizeMultiplier
         }
     }
 }
