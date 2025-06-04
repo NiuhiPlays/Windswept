@@ -16,7 +16,7 @@ public class FootprintParticle extends SpriteBillboardParticle {
         super(world, x, y, z);
         this.spriteProvider = spriteProvider;
         this.maxAge = 25 ;
-        this.scale = 0.2f;
+        this.scale = 0.3f;
 
 
         // Set initial sprite frame
@@ -28,12 +28,12 @@ public class FootprintParticle extends SpriteBillboardParticle {
         super.tick();
 
         // Animate sprite
-        this.animationTimer += 0.8f;
+        this.animationTimer += 0.5f;
         int frameIndex = ((int) this.animationTimer) % 8;
         this.setSprite(spriteProvider.getSprite(frameIndex, 1));
 
         // Quick fade
-        this.alpha = 0.7f - ((float) this.age / this.maxAge) * 0.6f;
+        this.alpha = 0.8f - ((float) this.age / this.maxAge) * 0.3f;
 
     }
     public void render(VertexConsumer buffer, Camera camera, float partialTicks) {
