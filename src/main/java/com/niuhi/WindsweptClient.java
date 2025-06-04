@@ -1,6 +1,7 @@
 package com.niuhi;
 
 import com.niuhi.water.CascadeSystem;
+import com.niuhi.water.RippleSystem;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
@@ -13,8 +14,9 @@ public class WindsweptClient implements ClientModInitializer {
     public void onInitializeClient() {
         ClientTickEvents.END_CLIENT_TICK.register(new ClientTickHandler());
 
-        // Cascade Logic
+        // Water related Logic
         CascadeSystem.register();
+        RippleSystem.register();
     }
 
     private static class ClientTickHandler implements ClientTickEvents.EndTick {

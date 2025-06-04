@@ -1,5 +1,11 @@
 {
   "textures": [
-    ""
+    "windswept:water_ripple_1",
+    "windswept:water_ripple_2",
+    "windswept:water_ripple_3",
+    "windswept:water_ripple_4",
+    "windswept:water_ripple_5",
+    "windswept:water_ripple_6",
+    "windswept:water_ripple_7"
   ]
 }
