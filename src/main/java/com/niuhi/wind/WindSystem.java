@@ -68,7 +68,7 @@ public class WindSystem {
     public void tickWindArea(BlockPos center, int radius) {
         updateWindDirection();
         if (world.getTime() % 20 == 0) {
-            spawnWindParticles(center, radius, 1 + random.nextInt(15));
+            spawnWindParticles(center, radius, 1 + random.nextInt(10));
         }
     }
 
