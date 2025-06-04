@@ -1,5 +1,6 @@
 package com.niuhi;
 
+import com.niuhi.player.FootprintSystem;
 import com.niuhi.water.CascadeSystem;
 import com.niuhi.water.RippleSystem;
 import net.fabricmc.api.ClientModInitializer;
@@ -17,6 +18,7 @@ public class WindsweptClient implements ClientModInitializer {
         // Water related Logic
         CascadeSystem.register();
         RippleSystem.register();
+        FootprintSystem.register();
     }
 
     private static class ClientTickHandler implements ClientTickEvents.EndTick {
