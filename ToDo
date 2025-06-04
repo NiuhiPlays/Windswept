@@ -56,7 +56,18 @@ All just for you! No server install needed!
 
 //ToDo - Add sounds to Particles
     Wind
+        Different sounds for different wind strengths
+        Different sounds for locations
+            Caves
+            Plains
+            Desert
+            Forest
+            Mountains
+            Ocean
     Water
+        Lake
+        River
+        Ocean
     Foliage
 
 //ToDo - Make Own Wind Particle Textures
