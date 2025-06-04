@@ -43,6 +43,7 @@ All just for you! No server install needed!
 //ToDo - Make Clouds react to biomes
 
 //ToDo - Make foliage react to wind
+        Might need to animate foliage
     Grass
     Flowers
 
@@ -50,10 +51,19 @@ All just for you! No server install needed!
     Waterfall / Cascades
     Item/Entity - Ripples
 
-//ToDo - Water Particles, like Effective / Particular
+//ToDo - Water Particles, like Effective / Particular & Tidal
     Splashes
     Wakes
     Tides/ waves
+
+//ToDo - Player particles
+    Footsteps (Also Animals & Mobs)
+        Normal
+        Snow
+        Wet
+    Running
+
+//ToDo - Rework Particle Culling
 
 //ToDo - Add sounds to Particles
     Wind
@@ -72,6 +82,10 @@ All just for you! No server install needed!
     Foliage
 
 //ToDo - Make Own Wind Particle Textures
+        Soft wind
+        Medium wind
+        Strong wind
+        Storm Wind
 //ToDo - Replace Wind Particles with own Textures
 
 ------------------------------------------------------------------------------------------------------------------------
