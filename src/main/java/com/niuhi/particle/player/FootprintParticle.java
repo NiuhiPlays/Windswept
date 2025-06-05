@@ -15,7 +15,7 @@ public class FootprintParticle extends SpriteBillboardParticle {
     protected FootprintParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider) {
         super(world, x, y, z);
         this.spriteProvider = spriteProvider;
-        this.maxAge = 25 ;
+        this.maxAge = 200 ;
         this.scale = 0.3f;
 
 
@@ -33,7 +33,7 @@ public class FootprintParticle extends SpriteBillboardParticle {
         this.setSprite(spriteProvider.getSprite(frameIndex, 1));
 
         // Quick fade
-        this.alpha = 0.8f - ((float) this.age / this.maxAge) * 0.3f;
+        this.alpha = 0.8f - ((float) this.age / this.maxAge) * 0.8f;
 
     }
     public void render(VertexConsumer buffer, Camera camera, float partialTicks) {
