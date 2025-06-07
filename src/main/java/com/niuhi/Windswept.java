@@ -35,6 +35,11 @@ public class Windswept implements ModInitializer {
 		//Player Particles
 		PlayerParticleTypes.registerParticles();
 		ParticleFactoryRegistry.getInstance().register(PlayerParticleTypes.FOOTPRINT, FootprintParticle.Factory::new);
+		ParticleFactoryRegistry.getInstance().register(PlayerParticleTypes.FOOTPRINT_WET, FootprintParticle.Factory::new);
+		ParticleFactoryRegistry.getInstance().register(PlayerParticleTypes.FOOTPRINT_SNOW, FootprintParticle.Factory::new);
+		ParticleFactoryRegistry.getInstance().register(PlayerParticleTypes.FOOTPRINT_MUDDY, FootprintParticle.Factory::new);
+		ParticleFactoryRegistry.getInstance().register(PlayerParticleTypes.FOOTPRINT_SAND, FootprintParticle.Factory::new);
+		ParticleFactoryRegistry.getInstance().register(PlayerParticleTypes.FOOTPRINT_REDSAND, FootprintParticle.Factory::new);
 		ParticleFactoryRegistry.getInstance().register(PlayerParticleTypes.DUST_CLOUD, DustCloudParticle.Factory::new);
 	}
 }
