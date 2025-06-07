@@ -3,6 +3,7 @@ package com.niuhi.player;
 import com.niuhi.particle.player.PlayerParticleTypes;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.SnowBlock;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -17,6 +18,7 @@ public class FootprintSystem {
     private static final Map<UUID, EntityStepTracker> stepTrackers = new HashMap<>();
     private static final double STEP_DISTANCE = 0.6; // Distance per step for footprint spawning
     private static final float FOOT_OFFSET = 0.2f; // Offset for left/right foot placement
+    private static final int WET_DURATION_TICKS = 60; // 5 seconds at 20 ticks/second
 
     public static void register() {
         // Register client tick event to track entity movement
@@ -39,10 +41,20 @@ public class FootprintSystem {
                 continue;
             }
 
-            // Skip entities that are not moving on the ground or landing
-            boolean isOnGround = livingEntity.isOnGround();
+            // Update wet state
             UUID entityId = entity.getUuid();
             EntityStepTracker tracker = stepTrackers.computeIfAbsent(entityId, k -> new EntityStepTracker());
+            if (livingEntity.isTouchingWaterOrRain()) {
+                tracker.wetTicks = WET_DURATION_TICKS; // Reset wet timer
+            } else if (tracker.wetTicks > 0) {
+                tracker.wetTicks--; // Decrement wet timer
+            }
+
+            // Skip entities that are not moving on the ground or landing
+            boolean isOnGround = livingEntity.isOnGround();
+            if (!isOnGround && !tracker.wasInAir) {
+                continue;
+            }
 
             // Check for landing from a jump
             boolean justLanded = isOnGround && tracker.wasInAir;
@@ -84,33 +96,49 @@ public class FootprintSystem {
         double z = pos.z + offsetX * Math.sin(Math.toRadians(yaw));
         double y = pos.y;
 
+        // Adjust y position for snow layers or mud
+        BlockPos blockPos = new BlockPos((int) x, (int) (y + 0.0625), (int) z);
+        if (world.getBlockState(blockPos).isOf(Blocks.SNOW) || world.getBlockState(blockPos.down()).isOf(Blocks.SNOW)) {
+            int layers = world.getBlockState(blockPos).isOf(Blocks.SNOW) ?
+                    world.getBlockState(blockPos).get(SnowBlock.LAYERS) :
+                    world.getBlockState(blockPos.down()).get(SnowBlock.LAYERS);
+            y += layers * 0.125; // Each snow layer is 1/8 block (0.125) tall
+        } else if (world.getBlockState(blockPos).isOf(Blocks.MUD) || world.getBlockState(blockPos.down()).isOf(Blocks.MUD)) {
+            y += 0.125; // Mud is 0.9 blocks tall, add offset to place on surface
+        }
+
         // Determine the appropriate particle based on block or weather
-        SimpleParticleType particleType = getFootprintParticle(world, x, y, z, entity);
+        SimpleParticleType particleType = getFootprintParticle(world, x, y, z, entity, tracker);
 
         // Spawn the particle
         world.addParticleClient(particleType, x, y, z, 0, 0, 0);
     }
 
-    private static SimpleParticleType getFootprintParticle(ClientWorld world, double x, double y, double z, Entity entity) {
+    private static SimpleParticleType getFootprintParticle(ClientWorld world, double x, double y, double z, Entity entity, EntityStepTracker tracker) {
         // Check block state for specific blocks
         BlockPos pos = new BlockPos((int) x, (int) (y + 0.0625), (int) z); // Slightly above for thin blocks like snow
         BlockPos posBelow = pos.down();
 
         if (world.getBlockState(pos).isOf(Blocks.SNOW) || world.getBlockState(posBelow).isOf(Blocks.SNOW) ||
-                world.getBlockState(pos).isOf(Blocks.SNOW_BLOCK) || world.getBlockState(posBelow).isOf(Blocks.SNOW_BLOCK)) {
+                world.getBlockState(pos).isOf(Blocks.SNOW_BLOCK) || world.getBlockState(posBelow).isOf(Blocks.SNOW_BLOCK)
+                || world.getBlockState(posBelow).isOf(Blocks.POWDER_SNOW)) {
             return PlayerParticleTypes.FOOTPRINT_SNOW;
         }
-        if (world.getBlockState(pos).isOf(Blocks.SAND) || world.getBlockState(posBelow).isOf(Blocks.SAND)) {
+        if (world.getBlockState(pos).isOf(Blocks.SAND) || world.getBlockState(posBelow).isOf(Blocks.SAND) || world.getBlockState(posBelow).isOf(Blocks.SUSPICIOUS_SAND)) {
             return PlayerParticleTypes.FOOTPRINT_SAND;
         }
         if (world.getBlockState(pos).isOf(Blocks.RED_SAND) || world.getBlockState(posBelow).isOf(Blocks.RED_SAND)) {
             return PlayerParticleTypes.FOOTPRINT_REDSAND;
         }
-        if (world.getBlockState(pos).isOf(Blocks.MUD) || world.getBlockState(posBelow).isOf(Blocks.MUD)) {
+        if (world.getBlockState(pos).isOf(Blocks.MUD) ||
+                world.getBlockState(posBelow).isOf(Blocks.MUD) || world.getBlockState(posBelow).isOf(Blocks.PACKED_MUD) ||
+                world.getBlockState(pos).isOf(Blocks.DIRT) || world.getBlockState(posBelow).isOf(Blocks.DIRT) ||
+                world.getBlockState(pos).isOf(Blocks.COARSE_DIRT) || world.getBlockState(posBelow).isOf(Blocks.COARSE_DIRT) ||
+                world.getBlockState(pos).isOf(Blocks.ROOTED_DIRT) || world.getBlockState(posBelow).isOf(Blocks.ROOTED_DIRT)) {
             return PlayerParticleTypes.FOOTPRINT_MUDDY;
         }
-        // Check for water or rain
-        if (entity instanceof LivingEntity livingEntity && livingEntity.isTouchingWaterOrRain()) {
+        // Check for water or rain, or persistent wet state
+        if (entity instanceof LivingEntity livingEntity && (livingEntity.isTouchingWaterOrRain() || tracker.wetTicks > 0)) {
             return PlayerParticleTypes.FOOTPRINT_WET;
         }
 
@@ -124,5 +152,6 @@ public class FootprintSystem {
         double distanceTraveled = 0;
         boolean isLeftFoot = true;
         boolean wasInAir = false; // Track if entity was in air for jump detection
+        int wetTicks = 0; // Track wet state duration
     }
 }
