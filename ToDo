@@ -68,12 +68,15 @@ All just for you! No server install needed!
 //DONE - Player particles
     Footsteps (Also Animals & Mobs)
         Normal
-
-//ToDo - Player particles
-    Footsteps (Also Animals & Mobs)
         Snow
         Wet
         Sand
+        Muddy
+        Red Sand
+
+//ToDo - Player particles
+    Footsteps (Also Animals & Mobs)
+        Leaves
     Running
 
 //ToDo - Rework Particle Culling
