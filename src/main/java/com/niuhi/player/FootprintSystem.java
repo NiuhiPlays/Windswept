@@ -7,6 +7,7 @@ import net.minecraft.block.SnowBlock;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.particle.SimpleParticleType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -16,9 +17,13 @@ import java.util.UUID;
 
 public class FootprintSystem {
     private static final Map<UUID, EntityStepTracker> stepTrackers = new HashMap<>();
-    private static final double STEP_DISTANCE = 0.6; // Distance per step for footprint spawning
-    private static final float FOOT_OFFSET = 0.2f; // Offset for left/right foot placement
+    private static final double PLAYER_STEP_DISTANCE = 0.6; // Distance per step for players
+    private static final float BASE_FOOT_OFFSET = 0.2f; // Fallback offset
+    private static final float MIN_FOOT_OFFSET = 0.08f; // CHANGE: Lowered min for smaller mobs
+    private static final float MAX_FOOT_OFFSET = 0.6f; // CHANGE: Increased max for larger mobs
     private static final int WET_DURATION_TICKS = 60; // 3 seconds at 20 ticks/second
+    private static final double PLAYER_MIN_VELOCITY_SQUARED = 0.01; // Velocity threshold for players
+    private static final int MOB_FOOTPRINT_COOLDOWN = 6; // Cooldown in ticks (~0.3s) for mob footprints
 
     public static void register() {
         // Register client tick event to track entity movement
@@ -50,6 +55,11 @@ public class FootprintSystem {
                 tracker.wetTicks--; // Decrement wet timer
             }
 
+            // Decrement cooldown for all entities
+            if (tracker.footprintCooldown > 0) {
+                tracker.footprintCooldown--;
+            }
+
             // Skip entities that are not moving on the ground or landing
             boolean isOnGround = livingEntity.isOnGround();
             if (!isOnGround && !tracker.wasInAir) {
@@ -58,40 +68,69 @@ public class FootprintSystem {
 
             // Check for landing from a jump
             boolean justLanded = isOnGround && tracker.wasInAir;
-            if (justLanded) {
+            if (justLanded && tracker.footprintCooldown == 0) {
                 spawnFootprint(world, entity, tracker);
                 tracker.isLeftFoot = !tracker.isLeftFoot; // Alternate feet
+                tracker.footprintCooldown = MOB_FOOTPRINT_COOLDOWN;
             }
 
             // Update air state
             tracker.wasInAir = !isOnGround;
 
             // Check for walking/running movement
-            if (!isOnGround || entity.getVelocity().horizontalLengthSquared() < 0.01) {
+            if (!isOnGround) {
                 continue;
             }
 
-            // Update distance traveled
-            Vec3d pos = entity.getPos();
-            double distance = tracker.lastPos == null ? 0 : pos.distanceTo(tracker.lastPos);
-            tracker.distanceTraveled += distance;
+            // Simplified mob footprint spawning with cooldown
+            if (livingEntity instanceof MobEntity) {
+                // Spawn footprint for mobs on ground with any movement, if cooldown allows
+                Vec3d pos = entity.getPos();
+                if (tracker.footprintCooldown == 0 && tracker.lastPos != null && !pos.equals(tracker.lastPos)) {
+                    spawnFootprint(world, entity, tracker);
+                    tracker.isLeftFoot = !tracker.isLeftFoot; // Alternate feet
+                    tracker.footprintCooldown = MOB_FOOTPRINT_COOLDOWN;
+                }
+                tracker.lastPos = pos; // Update last position
+            } else {
+                // Player movement
+                if (entity.getVelocity().horizontalLengthSquared() < PLAYER_MIN_VELOCITY_SQUARED) {
+                    continue;
+                }
 
-            // Check if enough distance has been traveled to spawn a footprint
-            if (tracker.distanceTraveled >= STEP_DISTANCE) {
-                spawnFootprint(world, entity, tracker);
-                tracker.distanceTraveled = 0; // Reset distance
-                tracker.isLeftFoot = !tracker.isLeftFoot; // Alternate feet
+                // Update distance traveled
+                Vec3d pos = entity.getPos();
+                double distance = tracker.lastPos == null ? 0 : pos.distanceTo(tracker.lastPos);
+                tracker.distanceTraveled += distance;
+
+                // Check if enough distance has been traveled to spawn a footprint
+                if (tracker.distanceTraveled >= PLAYER_STEP_DISTANCE) {
+                    spawnFootprint(world, entity, tracker);
+                    tracker.distanceTraveled = 0; // Reset distance
+                    tracker.isLeftFoot = !tracker.isLeftFoot; // Alternate feet
+                    tracker.footprintCooldown = MOB_FOOTPRINT_COOLDOWN;
+                }
+
+                tracker.lastPos = pos; // Update last position
             }
-
-            tracker.lastPos = pos; // Update last position
         }
     }
 
     private static void spawnFootprint(ClientWorld world, Entity entity, EntityStepTracker tracker) {
+        // CHANGE: Adjusted dynamic foot offset calculation
+        float footOffset = BASE_FOOT_OFFSET;
+        if (entity instanceof LivingEntity) {
+            double boxWidth = entity.getBoundingBox().getLengthX();
+            if (boxWidth > 0) { // Ensure valid width
+                footOffset = (float) (boxWidth * 0.3); // Increased scaling factor
+                footOffset = Math.max(MIN_FOOT_OFFSET, Math.min(MAX_FOOT_OFFSET, footOffset)); // Wider clamp range
+            }
+        }
+
         // Calculate footprint position (offset left or right based on foot)
         Vec3d pos = entity.getPos();
         float yaw = entity.getYaw();
-        float offsetX = tracker.isLeftFoot ? -FOOT_OFFSET : FOOT_OFFSET;
+        float offsetX = tracker.isLeftFoot ? -footOffset : footOffset;
         double x = pos.x + offsetX * Math.cos(Math.toRadians(yaw));
         double z = pos.z + offsetX * Math.sin(Math.toRadians(yaw));
         double y = pos.y;
@@ -155,7 +194,6 @@ public class FootprintSystem {
 
     private static boolean isExposedToRain(ClientWorld world, double x, double y, double z) {
         BlockPos pos = new BlockPos((int) x, (int) y, (int) z);
-        // Check if the sky is visible above the entity (no solid blocks)
         return world.isSkyVisible(pos) && !world.getBlockState(pos.up()).isSolidBlock(world, pos.up());
     }
 
@@ -166,5 +204,6 @@ public class FootprintSystem {
         boolean isLeftFoot = true;
         boolean wasInAir = false; // Track if entity was in air for jump detection
         int wetTicks = 0; // Track wet state duration
+        int footprintCooldown = 0; // Track ticks since last footprint
     }
 }
