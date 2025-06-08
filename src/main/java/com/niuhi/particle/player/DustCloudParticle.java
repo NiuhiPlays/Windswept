@@ -11,22 +11,15 @@ public class DustCloudParticle extends SpriteBillboardParticle {
     protected DustCloudParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider) {
         super(world, x, y, z);
         this.spriteProvider = spriteProvider;
-        this.maxAge = 25 + random.nextInt(10); // 25-35 ticks - shorter than tide splash
-        this.scale = 0.2f + random.nextFloat() * 0.3f; // Smaller than tide splash
-
-        // Quick, small splash velocities
-        double angle = random.nextDouble() * Math.PI * 2;
-        double speed = 0.05 + random.nextDouble() * 0.08;
-        this.velocityX = Math.cos(angle) * speed;
-        this.velocityZ = Math.sin(angle) * speed;
-        this.velocityY = 0.02 + random.nextDouble() * 0.06; // Small upward motion
+        this.maxAge = 25;
+        this.scale = 0.8f;
 
         this.alpha = 0.7f;
-        this.gravityStrength = 0.06f; // More affected by gravity than tide splash
+        this.gravityStrength = 0.06f;
         this.animationTimer = 0.0f;
 
         // Set initial sprite frame
-        this.setSprite(spriteProvider.getSprite(0, 7)); // Assuming 8 frames (0-7)
+        this.setSprite(spriteProvider.getSprite(0, 5));
     }
 
     @Override
@@ -36,7 +29,7 @@ public class DustCloudParticle extends SpriteBillboardParticle {
         // Animate sprite
         this.animationTimer += 0.8f;
         int frameIndex = ((int) this.animationTimer) % 8;
-        this.setSprite(spriteProvider.getSprite(frameIndex, 7));
+        this.setSprite(spriteProvider.getSprite(frameIndex, 6));
 
         // Quick fade
         this.alpha = 0.7f - ((float) this.age / this.maxAge) * 0.6f;

@@ -5,7 +5,8 @@
   "mixins": [
     "CascadeMixin",
     "LeafletMixin",
-    "SmokeMixin"
+    "SmokeMixin",
+    "DustCloudMixin"
   ],
   "injectors": {
     "defaultRequire": 1
