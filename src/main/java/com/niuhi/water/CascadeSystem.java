@@ -52,7 +52,7 @@ public class CascadeSystem {
     }
 
     // Find if flowing water at this position eventually hits a still water pond below
-    private static BlockPos findWaterfallImpact(World world, BlockPos pos) {
+    public static BlockPos findWaterfallImpact(World world, BlockPos pos) {
         FluidState fluidState = world.getFluidState(pos);
 
         // Current position must have flowing water
@@ -136,7 +136,7 @@ public class CascadeSystem {
     }
 
     // Calculate waterfall intensity based on the amount and flow of water above
-    private static float getWaterfallIntensity(World world, BlockPos flowingWaterPos) {
+    public static float getWaterfallIntensity(World world, BlockPos flowingWaterPos) {
         int flowingBlocksAbove = 0;
         int maxHeight = 15; // Check up to 15 blocks above
 
