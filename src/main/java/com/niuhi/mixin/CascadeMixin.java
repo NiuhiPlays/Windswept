@@ -23,18 +23,14 @@ public abstract class CascadeMixin extends SpriteBillboardParticle {
             WindSystem windSystem = Windswept.WIND_SYSTEM;
             Vec3d windDirection = windSystem.getWindDirection();
             float windStrength = windSystem.getWindStrength();
-
-            // Stronger effect for cascade particles since they're water droplets
-            float baseStrength = 0.0005f; // More responsive to wind than leaves
-
-            // Apply wind with realistic water droplet physics
+            float baseStrength = 0.0005f; // Stronger effect for water droplets
             this.velocityX += windDirection.x * windStrength * baseStrength;
             this.velocityY += windDirection.y * windStrength * baseStrength;
-            this.velocityZ += -windDirection.z * windStrength * baseStrength; // Negate Z to match your system
+            this.velocityZ += -windDirection.z * windStrength * baseStrength; // Negate Z to match WindParticle render
 
-            // Optional: Add some drag effect in strong winds
-            if (windStrength > 0.5f) {
-                float dragFactor = 0.98f; // Slight drag in strong winds
+            // Apply drag in strong winds
+            if (windStrength > 1.0f) { // Affects NORMAL and HEAVY winds
+                float dragFactor = 0.98f;
                 this.velocityX *= dragFactor;
                 this.velocityZ *= dragFactor;
             }

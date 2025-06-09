@@ -23,18 +23,14 @@ public abstract class DustCloudMixin extends SpriteBillboardParticle {
             WindSystem windSystem = Windswept.WIND_SYSTEM;
             Vec3d windDirection = windSystem.getWindDirection();
             float windStrength = windSystem.getWindStrength();
-
-            // Moderate effect for dust particles (lighter than water, heavier than smoke)
-            float baseStrength = 0.01f; // Between leaves (0.001) and cascade (0.0005)
-
-            // Apply wind with realistic dust physics
+            float baseStrength = 0.01f; // Moderate effect for dust
             this.velocityX += windDirection.x * windStrength * baseStrength;
             this.velocityY += windDirection.y * windStrength * baseStrength;
             this.velocityZ += -windDirection.z * windStrength * baseStrength; // Negate Z to match WindParticle render
 
-            // Optional: Add slight drag in strong winds
-            if (windStrength > 0.5f) {
-                float dragFactor = 0.99f; // Minimal drag for dust
+            // Apply drag in strong winds
+            if (windStrength > 1.0f) { // Affects NORMAL and HEAVY winds
+                float dragFactor = 0.99f;
                 this.velocityX *= dragFactor;
                 this.velocityZ *= dragFactor;
             }
