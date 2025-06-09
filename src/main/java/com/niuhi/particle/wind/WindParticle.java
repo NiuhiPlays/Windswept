@@ -21,10 +21,19 @@ public class WindParticle extends SpriteBillboardParticle {
                            SpriteProvider spriteProvider, WindSystem windSystem) {
         super(world, x, y, z, 0, 0, 0);
         this.spriteProvider = spriteProvider;
-        this.maxAge = 100 + world.random.nextInt(80);
-        this.scale = 0.8f + world.random.nextFloat() * 0.4f;
-        this.alpha = 0.8f;
         this.windSystem = windSystem;
+        this.maxAge = 100 + world.random.nextInt(80);
+
+        // Set scale based on wind type
+        float baseScale = switch (windSystem.getWindType()) {
+            case SOFT -> 0.5f;
+            case NORMAL -> 1.0f;
+            case HEAVY -> 2.0f;
+            default -> 0.8f; // Fallback for NONE (though particles shouldn't spawn)
+        };
+        this.scale = baseScale + world.random.nextFloat() * 0.2f; // Slight variation
+
+        this.alpha = 0.8f;
         this.setSprite(spriteProvider.getSprite(0, 30));
         this.collidesWithWorld = false;
         this.gravityStrength = 0.0f;
@@ -41,7 +50,7 @@ public class WindParticle extends SpriteBillboardParticle {
         }
 
         this.scale += (float) (random.nextGaussian() * 0.001);
-        this.scale = Math.max(0.6f, Math.min(1.0f, this.scale));
+        this.scale = Math.max(0.4f, Math.min(1.4f, this.scale)); // Adjusted bounds for scaling
     }
 
     @Override

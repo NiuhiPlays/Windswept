@@ -19,7 +19,7 @@ public class WindSystem {
     private long lastWindChangeDay;
 
     public enum WindType {
-        SOFT(0.5f), NORMAL(1.0f), HEAVY(2.0f);
+        NONE(0.0f), SOFT(0.2f), NORMAL(0.8f), HEAVY(2.0f);
 
         private final float strength;
 
@@ -61,25 +61,33 @@ public class WindSystem {
         if (world == null) return;
         long currentDay = world.getTimeOfDay() / 24000;
         if (currentDay > lastWindChangeDay) {
-            // Update direction
-            int directionIndex = random.nextInt(8);
-            double angle = directionIndex * Math.PI / 4; // 45-degree increments
-            double x = Math.cos(angle);
-            double z = Math.sin(angle);
-            this.windDirection = new Vec3d(x, 0.1, z).normalize();
-
-            // Update wind type
-            if (world.isRaining() || world.isThundering()) {
-                this.windType = WindType.HEAVY;
+            // Update direction (9 options: 8 cardinal + no wind)
+            int directionIndex = random.nextInt(9);
+            if (directionIndex == 8) {
+                // No wind day (~11.1% chance)
+                this.windDirection = Vec3d.ZERO;
+                this.windType = WindType.NONE;
             } else {
-                // 70% chance for NORMAL, 30% chance for SOFT
-                this.windType = random.nextFloat() < 0.3f ? WindType.SOFT : WindType.NORMAL;
+                // Cardinal direction
+                double angle = directionIndex * Math.PI / 4; // 45-degree increments
+                double x = Math.cos(angle);
+                double z = Math.sin(angle);
+                this.windDirection = new Vec3d(x, 0.1, z).normalize();
+
+                // Update wind type
+                if (world.isThundering()) {
+                    this.windType = WindType.HEAVY; // Always HEAVY during storms
+                } else {
+                    // 50% chance for SOFT, 50% chance for NORMAL
+                    this.windType = random.nextFloat() < 0.5f ? WindType.SOFT : WindType.NORMAL;
+                }
             }
             this.lastWindChangeDay = currentDay;
         }
     }
 
     public void spawnWindParticles(BlockPos center, int radius, int particleCount) {
+        if (windType == WindType.NONE) return; // No particles on no-wind days
         for (int i = 0; i < particleCount; i++) {
             int x = center.getX() + (int) (random.nextGaussian() * radius);
             int z = center.getZ() + (int) (random.nextGaussian() * radius);
@@ -95,14 +103,13 @@ public class WindSystem {
     }
 
     public void tickWindArea(BlockPos center, int radius) {
-
-
-        System: updateWind();
-        if (world.getTime() % 20 == 0) {
+        updateWind();
+        if (world.getTime() % 20 == 0 && windType != WindType.NONE) {
             int particleCount = switch (windType) {
                 case SOFT -> 1 + random.nextInt(3);
                 case NORMAL -> 1 + random.nextInt(5);
                 case HEAVY -> 2 + random.nextInt(7);
+                default -> 0; // No particles for NONE
             };
             spawnWindParticles(center, radius, particleCount);
         }
