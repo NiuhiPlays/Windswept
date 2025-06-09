@@ -46,9 +46,14 @@ All just for you! No server install needed!
 //ToDo - Make Clouds react to Wind
 //ToDo - Make Clouds react to Mountains
 //ToDo - Add a few more clouds
-//ToDo - Make Wind react to biomes
+
+//DONE- Make Wind
     Add 3 wind speeds
+
+//ToDo - Make Wind
     Biome based Wind Speeds
+    Storm Wind (Replaces Heavy Wind, but not removing)
+
 //ToDo - Make Clouds react to biomes
 
 //ToDo - Make foliage react to wind
@@ -80,7 +85,10 @@ All just for you! No server install needed!
         Leaves
 
 //ToDo - Rework Particle Culling
-//ToDo - Make Particles render through water
+    (Removed Culling files for now)
+
+//DONE - Make Particles render through water
+    Fixed because of the Old Culling System
 
 //ToDo - Add sounds to Particles
     Wind
@@ -97,6 +105,9 @@ All just for you! No server install needed!
         River
         Ocean
     Foliage
+
+//DONE - Make Own Wind Particle Textures
+    Temp Solution used - Scaled based on Wind Type
 
 //ToDo - Make Own Wind Particle Textures
         Soft wind
