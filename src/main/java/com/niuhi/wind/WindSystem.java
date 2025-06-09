@@ -19,7 +19,7 @@ public class WindSystem {
     private long lastWindChangeDay;
 
     public enum WindType {
-        NONE(0.0f), SOFT(0.2f), NORMAL(0.8f), HEAVY(2.0f);
+        NONE(0.0f), SOFT(0.5f), NORMAL(1.0f), HEAVY(2.0f), STORM(4.0f);
 
         private final float strength;
 
@@ -58,7 +58,7 @@ public class WindSystem {
     }
 
     private void updateWind() {
-        if (world == null) return;
+        if (world == null || client.player == null) return;
         long currentDay = world.getTimeOfDay() / 24000;
         if (currentDay > lastWindChangeDay) {
             // Update direction (9 options: 8 cardinal + no wind)
@@ -76,10 +76,21 @@ public class WindSystem {
 
                 // Update wind type
                 if (world.isThundering()) {
-                    this.windType = WindType.HEAVY; // Always HEAVY during storms
+                    this.windType = WindType.STORM;
+                } else if (world.isRaining()) {
+                    this.windType = random.nextFloat() < 0.6f ? WindType.HEAVY : (random.nextFloat() < 0.5f ? WindType.SOFT : WindType.NORMAL);
                 } else {
-                    // 50% chance for SOFT, 50% chance for NORMAL
-                    this.windType = random.nextFloat() < 0.5f ? WindType.SOFT : WindType.NORMAL;
+                    // Get biome-based wind type probabilities
+                    BlockPos playerPos = client.player.getBlockPos();
+                    BiomeWinds.WindTypeWeights weights = BiomeWinds.getWindTypeWeights(world, playerPos);
+                    float roll = random.nextFloat();
+                    if (roll < weights.softChance()) {
+                        this.windType = WindType.SOFT;
+                    } else if (roll < weights.softChance() + weights.normalChance()) {
+                        this.windType = WindType.NORMAL;
+                    } else {
+                        this.windType = WindType.HEAVY;
+                    }
                 }
             }
             this.lastWindChangeDay = currentDay;
@@ -106,10 +117,11 @@ public class WindSystem {
         updateWind();
         if (world.getTime() % 20 == 0 && windType != WindType.NONE) {
             int particleCount = switch (windType) {
-                case SOFT -> 1 + random.nextInt(3);
-                case NORMAL -> 1 + random.nextInt(5);
-                case HEAVY -> 2 + random.nextInt(7);
-                default -> 0; // No particles for NONE
+                case SOFT -> 1 + random.nextInt(5);
+                case NORMAL -> 1 + random.nextInt(8);
+                case HEAVY -> 2 + random.nextInt(15);
+                case STORM -> 3 + random.nextInt(20); // More particles for STORM
+                default -> 0;
             };
             spawnWindParticles(center, radius, particleCount);
         }

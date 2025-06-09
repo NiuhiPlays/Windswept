@@ -26,9 +26,10 @@ public class WindParticle extends SpriteBillboardParticle {
 
         // Set scale based on wind type
         float baseScale = switch (windSystem.getWindType()) {
-            case SOFT -> 0.5f;
-            case NORMAL -> 1.0f;
-            case HEAVY -> 2.0f;
+            case SOFT -> 0.8f;
+            case NORMAL -> 1.2f;
+            case HEAVY -> 1.5f;
+            case STORM -> 2.0f; // Larger for STORM
             default -> 0.8f; // Fallback for NONE (though particles shouldn't spawn)
         };
         this.scale = baseScale + world.random.nextFloat() * 0.2f; // Slight variation
@@ -50,7 +51,7 @@ public class WindParticle extends SpriteBillboardParticle {
         }
 
         this.scale += (float) (random.nextGaussian() * 0.001);
-        this.scale = Math.max(0.4f, Math.min(1.4f, this.scale)); // Adjusted bounds for scaling
+        this.scale = Math.max(0.4f, Math.min(1.6f, this.scale)); // Adjusted bounds for STORM
     }
 
     @Override
