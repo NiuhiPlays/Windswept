@@ -1,7 +1,6 @@
 package com.niuhi.water;
 
 import com.niuhi.particle.water.WaterParticleTypes;
-import com.niuhi.water.culling.ParticleCulling;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
@@ -27,24 +26,22 @@ public class CascadeSystem {
                         BlockPos impactPos = findWaterfallImpact(world, pos);
                         if (impactPos != null) {
                             List<BlockPos> openSides = getOpenSides(world, impactPos);
-                            float baseSpawnChance = 0.05f; // Reduced from 0.10f to lower spawn frequency
+                            float baseSpawnChance = 0.05f;
                             float waterfallIntensity = getWaterfallIntensity(world, pos);
                             float pondSize = getPondSizeMultiplier(world, impactPos);
-                            float spawnChance = baseSpawnChance * waterfallIntensity * pondSize * (1 + openSides.size() * 0.10f); // Reduced openSides multiplier from 0.15f
-                            spawnChance = Math.min(spawnChance, 0.3f); // Reduced max spawn chance from 0.6f
+                            float spawnChance = baseSpawnChance * waterfallIntensity * pondSize * (1 + openSides.size() * 0.10f);
+                            spawnChance = Math.min(spawnChance, 0.3f);
 
                             if (world.random.nextFloat() < spawnChance) {
-                                float scale = 0.3f + (waterfallIntensity - 1.0f) * 0.15f + (openSides.size() * 0.05f); // Reduced scale modifiers
-                                scale = Math.min(scale, 1.0f); // Reduced max scale from 1.2f
+                                float scale = 0.3f + (waterfallIntensity - 1.0f) * 0.15f + (openSides.size() * 0.05f);
+                                scale = Math.min(scale, 1.0f);
                                 List<Vec3d> spawnPositions = getImpactSpawnPositions(world, impactPos, openSides);
-                                int maxParticlesPerSpawn = 2 + world.random.nextInt(3); // Limit to 2–4 particles per spawn event
+                                int maxParticlesPerSpawn = 2 + world.random.nextInt(3);
                                 for (int i = 0; i < Math.min(spawnPositions.size(), maxParticlesPerSpawn); i++) {
                                     Vec3d spawnPos = spawnPositions.get(i);
-                                    if (ParticleCulling.shouldRender(spawnPos, 2.0, 128.0)) {
-                                        world.addParticleClient(WaterParticleTypes.CASCADE,
-                                                spawnPos.x, spawnPos.y, spawnPos.z,
-                                                scale, 0.0, 0.0);
-                                    }
+                                    world.addParticleClient(WaterParticleTypes.CASCADE,
+                                            spawnPos.x, spawnPos.y, spawnPos.z,
+                                            scale, 0.0, 0.0);
                                 }
                             }
                         }
