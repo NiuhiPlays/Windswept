@@ -11,75 +11,80 @@ import net.minecraft.util.math.MathHelper;
 public class CrossfadeHandler {
     private final MinecraftClient client;
     private SoundInstance currentSound;
-    private SoundInstance fadingSound;
     private SoundEvent currentSoundEvent;
     private float currentVolume;
     private float targetVolume;
-    private float fadeProgress;
+    private float fade; // 0.0 (silent) to 1.0 (full volume)
     private final float fadeDuration; // In seconds
-    private long lastSoundStartTime; // Track when the last sound started
-    private static final float SOUND_OVERLAP_THRESHOLD = 0.1f; // Start new sound 0.1s before current ends
+    private long lastSoundStartTick; // Track sound start for proactive restarts
+    private static final float LOOP_OVERLAP = 2.5f; // Overlap for looping transitions
+    private static final float MIN_FADE_THRESHOLD = 0.05f; // Minimum fade to keep sound alive
 
     public CrossfadeHandler(float fadeDuration) {
         this.client = MinecraftClient.getInstance();
         this.currentSound = null;
-        this.fadingSound = null;
         this.currentSoundEvent = null;
         this.currentVolume = 0.0f;
         this.targetVolume = 0.0f;
-        this.fadeProgress = 1.0f;
-        this.fadeDuration = fadeDuration * 1.5f; // Increase fade duration by 50% for smoother overlap
-        this.lastSoundStartTime = 0;
+        this.fade = 0.0f;
+        this.fadeDuration = fadeDuration;
+        this.lastSoundStartTick = 0;
     }
 
     public void update(float deltaTime, SoundEvent sound, SoundType type, float targetVolume, BlockPos position) {
         this.targetVolume = targetVolume;
 
-        // Update fade progress for fading sound
-        if (fadeProgress < 1.0f && fadingSound != null) {
-            fadeProgress = MathHelper.clamp(fadeProgress + deltaTime / fadeDuration, 0.0f, 1.0f);
-            float fadeOutVolume = MathHelper.lerp(fadeProgress, currentVolume, 0.0f);
-            client.getSoundManager().updateSoundVolume(SoundCategory.AMBIENT, fadeOutVolume);
-            if (fadeProgress >= 1.0f) {
-                client.getSoundManager().stop(fadingSound);
-                fadingSound = null;
-            }
-        }
+        // Clean up any lingering sounds to prevent stacking
+        cleanUpSounds();
+
+        // Update fade for current sound
+        boolean shouldPlay = sound != null && targetVolume > MIN_FADE_THRESHOLD;
+        float fadeTarget = shouldPlay ? 1.0f : 0.0f;
+        fade = MathHelper.lerp(deltaTime / fadeDuration, fade, fadeTarget);
 
         // Update current volume
-        currentVolume = MathHelper.lerp(0.25f, currentVolume, targetVolume); // Slightly faster lerp for responsiveness
+        currentVolume = MathHelper.lerp(0.25f, currentVolume, targetVolume);
 
         // Check if a new sound instance is needed
-        boolean needsNewSound = sound != null && (
+        boolean needsNewSound = shouldPlay && (
                 sound != currentSoundEvent || // Different sound
                         currentSound == null || // No current sound
                         !client.getSoundManager().isPlaying(currentSound) || // Current sound stopped
-                        shouldPrestartSound() // Prestart for seamless looping
+                        shouldRestartForLoop() // Proactive restart for looping
         );
 
         if (needsNewSound) {
-            if (currentSound != null && currentVolume > 0.01f) {
-                fadingSound = currentSound;
-                fadeProgress = 0.0f; // Start crossfade
+            if (currentSound != null && fade > MIN_FADE_THRESHOLD) {
+                // Stop old sound immediately to prevent stacking
+                client.getSoundManager().stop(currentSound);
             }
             currentSound = null;
-            if (targetVolume > 0.05f) { // Higher threshold to avoid faint starts
-                currentSound = createSoundInstance(sound, type, currentVolume, position);
-                client.getSoundManager().play(currentSound);
-                currentSoundEvent = sound;
-                lastSoundStartTime = currentTick();
-            }
+            currentSound = createSoundInstance(sound, type, currentVolume * fade, position);
+            client.getSoundManager().play(currentSound);
+            currentSoundEvent = sound;
+            lastSoundStartTick = currentTick();
         } else if (currentSound != null) {
-            client.getSoundManager().updateSoundVolume(SoundCategory.AMBIENT, currentVolume);
+            client.getSoundManager().updateSoundVolume(SoundCategory.AMBIENT, currentVolume * fade);
         }
     }
 
-    private boolean shouldPrestartSound() {
-        // Placeholder: Assume sound duration is unknown; use a fixed overlap check every 5 seconds
-        // Ideally, we'd check the sound's actual duration, but Minecraft doesn't expose this
-        long currentTime = currentTick();
-        float ticksSinceStart = (currentTime - lastSoundStartTime) / 80.0f; // Convert ticks to seconds
-        return ticksSinceStart >= 5.0f - SOUND_OVERLAP_THRESHOLD; // Start new sound 0.1s before estimated end
+    private void cleanUpSounds() {
+        // Stop any unexpected sound instances to prevent stacking (e.g., during rapid wind changes)
+        if (currentSound != null && !client.getSoundManager().isPlaying(currentSound)) {
+            client.getSoundManager().stop(currentSound);
+            currentSound = null;
+            currentSoundEvent = null;
+        }
+    }
+
+    private boolean shouldRestartForLoop() {
+        if (currentSound == null || currentSoundEvent == null) return false;
+
+        // Use a heuristic for loop restart: restart every 3 seconds to ensure no gaps
+        // AmbientSounds avoids duration tracking, relying on fade and isPlaying
+        long currentTick = currentTick();
+        float elapsedSeconds = (currentTick - lastSoundStartTick) / 20.0f; // Ticks to seconds
+        return elapsedSeconds >= 20.0f - LOOP_OVERLAP; // Restart 0.15s before estimated loop point
     }
 
     private long currentTick() {
@@ -114,13 +119,9 @@ public class CrossfadeHandler {
             currentSound = null;
             currentSoundEvent = null;
         }
-        if (fadingSound != null) {
-            client.getSoundManager().stop(fadingSound);
-            fadingSound = null;
-        }
         currentVolume = 0.0f;
         targetVolume = 0.0f;
-        fadeProgress = 1.0f;
-        lastSoundStartTime = 0;
+        fade = 0.0f;
+        lastSoundStartTick = 0;
     }
 }
