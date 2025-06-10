@@ -34,7 +34,7 @@
   "cascade": {
     "sound": "windswept:cascade",
     "category": "AMBIENT",
-    "volume": 1.0,
+    "volume": 5.0,
     "pitch": 1.0,
     "loop": true,
     "fade_duration": 1.0

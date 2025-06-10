@@ -3,6 +3,7 @@ package com.niuhi;
 import com.niuhi.debug.DebugCommands;
 import com.niuhi.player.FootprintSystem;
 import com.niuhi.player.RunningCloudsSystem;
+import com.niuhi.sounds.AmbientSoundSystem;
 import com.niuhi.sounds.SoundEvents;
 import com.niuhi.water.CascadeSystem;
 import com.niuhi.water.RippleSystem;
@@ -25,6 +26,7 @@ public class WindsweptClient implements ClientModInitializer {
 
         // Sound Events
         SoundEvents.initialize();
+        AmbientSoundSystem.register();
 
         // Debug
         DebugCommands.register();
