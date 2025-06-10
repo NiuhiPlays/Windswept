@@ -18,8 +18,14 @@ Shit I need to do:
 
 //ToDo - Water Particles, like Effective / Particular & Tidal
     Wakes
+    Entity Splashes
 
 //ToDo - Make Waves and Splashes work
+    Splashes now work on Enities falling into the water to create splashes.
+        Might want to change these splashes to work with the Waves instead.
+    Waves need some Rework and more spawn logic.
+        It now spawns really easily, even simple water blocks against a block.
+        Should only work with Large body of water
 
 // Settings & Overall stuff
 
