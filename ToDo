@@ -17,9 +17,9 @@ Shit I need to do:
 // Water Shit
 
 //ToDo - Water Particles, like Effective / Particular & Tidal
-    Splashes
     Wakes
-    Tides/ waves
+
+//ToDo - Make Waves and Splashes work
 
 // Settings & Overall stuff
 
@@ -81,7 +81,12 @@ Shit I need to do:
 
 // Sound stuff
 
-//ToDo - Add sounds (Sound system still needs some overhaul work.)
+//ToDo - Overhaul Sound System
+//ToDo - Make Multiple sound versions
+    Loop versions
+    End particle versions
+
+//ToDo - Add sounds
     Wind
         Different sounds for locations
             Caves
@@ -94,6 +99,7 @@ Shit I need to do:
         Lake
         River
         Ocean
+        Waves
     Foliage
     Animals
     Weather
@@ -121,6 +127,8 @@ Shit that has been done sofar:
 //DONE- Water Particles, like Effective / Particular
     Waterfall / Cascades
     Item/Entity - Ripples
+    Tides/ waves
+    Splashes
 
 //DONE - Player particles
     Footsteps (Also Animals & Mobs)
