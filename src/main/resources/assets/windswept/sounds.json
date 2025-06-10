@@ -13,11 +13,5 @@
   },
   "cascade": {
     "sounds": ["windswept:water/cascade"]
-  },
-  "ripple": {
-    "sounds": ["windswept:water/ripple"]
-  },
-  "dustcloud": {
-    "sounds": ["windswept:entities/dustcloud"]
   }
 }

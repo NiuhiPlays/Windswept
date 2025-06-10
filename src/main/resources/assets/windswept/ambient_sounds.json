@@ -38,21 +38,5 @@
     "pitch": 1.0,
     "loop": true,
     "fade_duration": 1.0
-  },
-  "ripple": {
-    "sound": "windswept:ripple",
-    "category": "AMBIENT",
-    "volume": 1.0,
-    "pitch": 1.0,
-    "loop": true,
-    "fade_duration": 1.0
-  },
-  "dustcloud": {
-    "sound": "windswept:dustcloud",
-    "category": "AMBIENT",
-    "volume": 1.0,
-    "pitch": 1.0,
-    "loop": true,
-    "fade_duration": 1.0
   }
 }

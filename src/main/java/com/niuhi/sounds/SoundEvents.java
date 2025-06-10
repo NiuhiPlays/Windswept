@@ -11,8 +11,6 @@ public class SoundEvents {
     public static final SoundEvent HEAVY_WIND = register("heavy_wind");
     public static final SoundEvent STORM_WIND = register("storm_wind");
     public static final SoundEvent CASCADE = register("cascade");
-    public static final SoundEvent RIPPLE = register("ripple");
-    public static final SoundEvent DUSTCLOUD = register("dustcloud");
 
     private static SoundEvent register(String id) {
         Identifier identifier = Identifier.of("windswept", id);
