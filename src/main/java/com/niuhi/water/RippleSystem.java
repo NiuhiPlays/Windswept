@@ -16,8 +16,8 @@ public class RippleSystem {
     private static int tickCounter = 0;
 
     // Define settings for raindrop ripples
-    private record RippleSettings(float sizeMultiplier, float maxAge, float animationSpeed) {
-        static final RippleSettings RAINDROP = new RippleSettings(0.8f, 20.0f, 0.6f); // Small, quick ripples for rain
+    public record RippleSettings(float sizeMultiplier, float maxAge, float animationSpeed) {
+        public static final RippleSettings RAINDROP = new RippleSettings(0.8f, 20.0f, 0.6f); // Small, quick ripples for rain
     }
 
     public static void register() {
@@ -29,7 +29,7 @@ public class RippleSystem {
         });
     }
 
-    private static void spawnRipplesForRain(MinecraftClient client) {
+    public static void spawnRipplesForRain(MinecraftClient client) {
         ClientWorld world = client.world;
         if (world == null || !world.isRaining()) return; // Only spawn ripples during rain
 
@@ -60,7 +60,7 @@ public class RippleSystem {
         }
     }
 
-    private static void spawnRippleAtPosition(ClientWorld world, BlockPos pos) {
+    public static void spawnRippleAtPosition(ClientWorld world, BlockPos pos) {
         // Use raindrop-specific ripple settings
         RippleSettings settings = RippleSettings.RAINDROP;
 
