@@ -1,23 +1,23 @@
 {
   "soft_wind": {
-    "sounds": ["windswept:soft_wind"]
+    "sounds": ["windswept:ambient/wind/soft_wind"]
   },
   "normal_wind": {
-    "sounds": ["windswept:normal_wind"]
+    "sounds": ["windswept:ambient/wind/normal_wind"]
   },
   "heavy_wind": {
-    "sounds": ["windswept:heavy_wind"]
+    "sounds": ["windswept:ambient/wind/heavy_wind"]
   },
   "storm_wind": {
-    "sounds": ["windswept:storm_wind"]
+    "sounds": ["windswept:ambient/wind/storm_wind"]
   },
   "cascade": {
-    "sounds": ["windswept:cascade"]
+    "sounds": ["windswept:water/cascade"]
   },
   "ripple": {
-    "sounds": ["windswept:ripple"]
+    "sounds": ["windswept:water/ripple"]
   },
   "dustcloud": {
-    "sounds": ["windswept:dustcloud"]
+    "sounds": ["windswept:entities/dustcloud"]
   }
 }

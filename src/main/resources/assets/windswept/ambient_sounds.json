@@ -5,7 +5,7 @@
     "volume": 1.0,
     "pitch": 1.0,
     "loop": true,
-    "fade_duration": 2.0
+    "fade_duration": 1.0
   },
   "normal_wind": {
     "sound": "windswept:normal_wind",
@@ -13,7 +13,7 @@
     "volume": 1.0,
     "pitch": 1.0,
     "loop": true,
-    "fade_duration": 2.0
+    "fade_duration": 1.0
   },
   "heavy_wind": {
     "sound": "windswept:heavy_wind",
@@ -21,7 +21,7 @@
     "volume": 1.0,
     "pitch": 1.0,
     "loop": true,
-    "fade_duration": 2.0
+    "fade_duration": 1.0
   },
   "storm_wind": {
     "sound": "windswept:storm_wind",
@@ -29,7 +29,7 @@
     "volume": 1.0,
     "pitch": 1.0,
     "loop": true,
-    "fade_duration": 2.0
+    "fade_duration": 1.0
   },
   "cascade": {
     "sound": "windswept:cascade",
@@ -37,7 +37,7 @@
     "volume": 1.0,
     "pitch": 1.0,
     "loop": true,
-    "fade_duration": 1.5
+    "fade_duration": 1.0
   },
   "ripple": {
     "sound": "windswept:ripple",
@@ -45,14 +45,14 @@
     "volume": 1.0,
     "pitch": 1.0,
     "loop": true,
-    "fade_duration": 1.5
+    "fade_duration": 1.0
   },
   "dustcloud": {
     "sound": "windswept:dustcloud",
     "category": "AMBIENT",
     "volume": 1.0,
     "pitch": 1.0,
-    "loop": false,
-    "fade_duration": 0.5
+    "loop": true,
+    "fade_duration": 1.0
   }
 }
