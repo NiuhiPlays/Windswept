@@ -1,29 +1,28 @@
-Windswept Description
-
-Overhauling Minecraft's Visuals, making minecraft more cosy.
-
-Features like:
-
-Wind and Wind Reactions
-Water based effects, Cascades, Wakes, Tides and ripples
-Clouds Overhaul
-Weather Overhaul
-Ambient sounds
-
-All just for you! No server install needed!
+Just a list of things I want to do, or have done, for the mod.
 
 ------------------------------------------------------------------------------------------------------------------------
 
-//DONE - Add Wind Particles (particle from Breezy as a Placeholder)
-    Locked to Cardinal Dicrection, doesnt follow player
-//DONE - Add Wind
-    Cardinal Wind Directions, changes per Day
-//DONE - Make Some particles react to the Wind
-    Leaves
-    Smoke
+Shit I need to do:
+
+// Clouds Shit
+
 //ToDo - Make New Cloud Renderer
 //ToDo - Make Good looking Cloud
 //ToDo - Add a singular cloud type, while making adding more easy (Making sure Types react to how the clouds look)
+//ToDo - Make Clouds react to Wind
+//ToDo - Make Clouds react to Mountains
+//ToDo - Add a few more clouds
+//ToDo - Make Clouds react to Environment
+
+// Water Shit
+
+//ToDo - Water Particles, like Effective / Particular & Tidal
+    Splashes
+    Wakes
+    Tides/ waves
+
+// Settings & Overall stuff
+
 //ToDo - Overhaul settings
     Make Wind configurable
         Strength
@@ -39,60 +38,51 @@ All just for you! No server install needed!
         Particle Rain
         Iris & Sodium
         Fog
+    Make Sound Configurable
+        Volume
+        Enabling
+
+//ToDo - Rework Particle Culling
+    (Removed Culling files for now)
+
+//ToDo - Make Own Wind Particle Textures
+        Soft wind
+        Medium wind
+        Strong wind
+        Storm Wind
+
+// Weather Stuff
+
 //ToDo - Make Weather React to Wind
     Rain
     Snow
     Add Sandstorm
-//ToDo - Make Clouds react to Wind
-//ToDo - Make Clouds react to Mountains
-//ToDo - Add a few more clouds
 
-//DONE- Make Wind
-    Add 3 wind speeds
+// Wind Stuff
 
 //ToDo - Make Wind
-    Biome based Wind Speeds
-    Storm Wind (Replaces Heavy Wind, but not removing)
-
-//ToDo - Make Clouds react to biomes
+    Overhaul system yet again.
+        System Choices
+            Dynamic Wind
+            Static Biome Wind
+        Fix Dynamic Wind?
+        Currently doesn't work like intended.
 
 //ToDo - Make foliage react to wind
         Might need to animate foliage
     Grass
     Flowers
 
-//DONE- Water Particles, like Effective / Particular
-    Waterfall / Cascades
-    Item/Entity - Ripples
-
-//ToDo - Water Particles, like Effective / Particular & Tidal
-    Splashes
-    Wakes
-    Tides/ waves
-
-//DONE - Player particles
-    Footsteps (Also Animals & Mobs)
-        Normal
-        Snow
-        Wet
-        Sand
-        Muddy
-        Red Sand
-    Running
+// Entity & Player Particles stuff
 
 //ToDo - Player particles
     Footsteps (Also Animals & Mobs)
         Leaves
 
-//ToDo - Rework Particle Culling
-    (Removed Culling files for now)
+// Sound stuff
 
-//DONE - Make Particles render through water
-    Fixed because of the Old Culling System
-
-//ToDo - Add sounds to Particles
+//ToDo - Add sounds (Sound system still needs some overhaul work.)
     Wind
-        Different sounds for different wind strengths
         Different sounds for locations
             Caves
             Plains
@@ -105,15 +95,51 @@ All just for you! No server install needed!
         River
         Ocean
     Foliage
+    Animals
+    Weather
+    Nether Biome
+    End Biome
 
-//DONE - Make Own Wind Particle Textures
-    Temp Solution used - Scaled based on Wind Type
-
-//ToDo - Make Own Wind Particle Textures
-        Soft wind
-        Medium wind
-        Strong wind
-        Storm Wind
 
 ------------------------------------------------------------------------------------------------------------------------
 
+Shit that has been done sofar:
+
+//DONE - Add Wind Particles (particle from Breezy as a Placeholder)
+    Locked to Cardinal Dicrection, doesnt follow player
+//DONE - Add Wind
+    Cardinal Wind Directions, changes per Day
+//DONE - Make Some particles react to the Wind
+    Leaves
+    Smoke
+
+//DONE- Make Wind
+    Add 3 wind speeds
+    Biome based Wind Speeds
+    Storm Wind (Replaces Heavy Wind, but not removing)
+
+//DONE- Water Particles, like Effective / Particular
+    Waterfall / Cascades
+    Item/Entity - Ripples
+
+//DONE - Player particles
+    Footsteps (Also Animals & Mobs)
+        Normal
+        Snow
+        Wet
+        Sand
+        Muddy
+        Red Sand
+    Running
+
+//DONE - Make Particles render through water
+    Fixed because of the Old Culling System
+
+//DONE - Add Sounds (Sound system still needs some overhaul work.)
+    Wind
+        Different sounds for different wind strengths
+    Water
+        Cascades
+
+//DONE - Make Own Wind Particle Textures
+    Temp Solution used - Scaled based on Wind Type
