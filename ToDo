@@ -84,6 +84,8 @@ Shit I need to do:
 //ToDo - Player particles
     Footsteps (Also Animals & Mobs)
         Leaves
+        Wet Footprint (Change Texture look & add biome color instead)
+    Also should add light checks, footprints in dark areas now very visable
 
 // Sound stuff
 
@@ -106,6 +108,7 @@ Shit I need to do:
         River
         Ocean
         Waves
+        Splashes
     Foliage
     Animals
     Weather
