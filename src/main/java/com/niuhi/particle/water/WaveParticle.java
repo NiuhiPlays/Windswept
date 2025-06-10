@@ -3,6 +3,7 @@ package com.niuhi.particle.water;
 import net.minecraft.client.particle.*;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.SimpleParticleType;
+import net.minecraft.util.math.BlockPos;
 
 public class WaveParticle extends SpriteBillboardParticle {
     private final SpriteProvider spriteProvider;
@@ -14,6 +15,12 @@ public class WaveParticle extends SpriteBillboardParticle {
         this.maxAge = 25;
         this.scale = 1.0f;
         this.alpha = 1.0f;
+
+        // Set biome-based color
+        int waterColor = world.getBiome(new BlockPos((int)x, (int)y, (int)z)).value().getWaterColor();
+        this.red = ((waterColor >> 16) & 0xFF) / 255.0f;
+        this.green = ((waterColor >> 8) & 0xFF) / 255.0f;
+        this.blue = (waterColor & 0xFF) / 255.0f;
 
         // Set initial sprite frame
         this.setSprite(spriteProvider.getSprite(0, 19));
