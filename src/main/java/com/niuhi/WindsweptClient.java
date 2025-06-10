@@ -5,10 +5,7 @@ import com.niuhi.player.FootprintSystem;
 import com.niuhi.player.RunningCloudsSystem;
 import com.niuhi.sounds.AmbientSoundSystem;
 import com.niuhi.sounds.SoundEvents;
-import com.niuhi.water.CascadeSystem;
-import com.niuhi.water.RippleSystem;
-import com.niuhi.water.SplashSystem;
-import com.niuhi.water.WaveSystem;
+import com.niuhi.water.*;
 import com.niuhi.wind.WindSystem;
 import net.fabricmc.api.ClientModInitializer;
 
