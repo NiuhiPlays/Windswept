@@ -7,6 +7,8 @@ import com.niuhi.sounds.AmbientSoundSystem;
 import com.niuhi.sounds.SoundEvents;
 import com.niuhi.water.CascadeSystem;
 import com.niuhi.water.RippleSystem;
+import com.niuhi.water.SplashSystem;
+import com.niuhi.water.WaveSystem;
 import com.niuhi.wind.WindSystem;
 import net.fabricmc.api.ClientModInitializer;
 
@@ -16,6 +18,8 @@ public class WindsweptClient implements ClientModInitializer {
         // Water systems
         CascadeSystem.register();
         RippleSystem.register();
+        WaveSystem.register();
+        SplashSystem.register();
 
         // Player systems
         FootprintSystem.register();
