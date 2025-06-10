@@ -1,0 +1,58 @@
+{
+  "soft_wind": {
+    "sound": "windswept:soft_wind",
+    "category": "AMBIENT",
+    "volume": 1.0,
+    "pitch": 1.0,
+    "loop": true,
+    "fade_duration": 2.0
+  },
+  "normal_wind": {
+    "sound": "windswept:normal_wind",
+    "category": "AMBIENT",
+    "volume": 1.0,
+    "pitch": 1.0,
+    "loop": true,
+    "fade_duration": 2.0
+  },
+  "heavy_wind": {
+    "sound": "windswept:heavy_wind",
+    "category": "AMBIENT",
+    "volume": 1.0,
+    "pitch": 1.0,
+    "loop": true,
+    "fade_duration": 2.0
+  },
+  "storm_wind": {
+    "sound": "windswept:storm_wind",
+    "category": "AMBIENT",
+    "volume": 1.0,
+    "pitch": 1.0,
+    "loop": true,
+    "fade_duration": 2.0
+  },
+  "cascade": {
+    "sound": "windswept:cascade",
+    "category": "AMBIENT",
+    "volume": 1.0,
+    "pitch": 1.0,
+    "loop": true,
+    "fade_duration": 1.5
+  },
+  "ripple": {
+    "sound": "windswept:ripple",
+    "category": "AMBIENT",
+    "volume": 1.0,
+    "pitch": 1.0,
+    "loop": true,
+    "fade_duration": 1.5
+  },
+  "dustcloud": {
+    "sound": "windswept:dustcloud",
+    "category": "AMBIENT",
+    "volume": 1.0,
+    "pitch": 1.0,
+    "loop": false,
+    "fade_duration": 0.5
+  }
+}

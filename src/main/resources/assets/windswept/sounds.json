@@ -1,7 +1,23 @@
 {
-  "ambient.cascade": {
-    "sounds": [
-      "windswept:ambient/cascade"
-    ],
-    "subtitle": "windswept.subtitles.ambient.cascade"}
+  "soft_wind": {
+    "sounds": ["windswept:soft_wind"]
+  },
+  "normal_wind": {
+    "sounds": ["windswept:normal_wind"]
+  },
+  "heavy_wind": {
+    "sounds": ["windswept:heavy_wind"]
+  },
+  "storm_wind": {
+    "sounds": ["windswept:storm_wind"]
+  },
+  "cascade": {
+    "sounds": ["windswept:cascade"]
+  },
+  "ripple": {
+    "sounds": ["windswept:ripple"]
+  },
+  "dustcloud": {
+    "sounds": ["windswept:dustcloud"]
+  }
 }
