@@ -28,9 +28,11 @@ public class Windswept implements ModInitializer {
 		// Water Particles
 		WaterParticleTypes.registerParticles();
 		ParticleFactoryRegistry.getInstance().register(WaterParticleTypes.CASCADE, CascadeParticle.Factory::new);
-		ParticleFactoryRegistry.getInstance().register(WaterParticleTypes.TIDE_SPLASH, TideSplashParticle.Factory::new);
+		ParticleFactoryRegistry.getInstance().register(WaterParticleTypes.BIGSPLASH, BigSplashParticle.Factory::new);
 		ParticleFactoryRegistry.getInstance().register(WaterParticleTypes.RIPPLE, RippleParticle.Factory::new);
 		ParticleFactoryRegistry.getInstance().register(WaterParticleTypes.SPLASH, SplashParticle.Factory::new);
+		ParticleFactoryRegistry.getInstance().register(WaterParticleTypes.WAVE, WaveParticle.Factory::new);
+		ParticleFactoryRegistry.getInstance().register(WaterParticleTypes.FOAM, FoamParticle.Factory::new);
 
 		//Player Particles
 		PlayerParticleTypes.registerParticles();

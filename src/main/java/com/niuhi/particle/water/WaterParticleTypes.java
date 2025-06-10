@@ -8,18 +8,24 @@ import net.minecraft.util.Identifier;
 
 public class WaterParticleTypes {
     public static final SimpleParticleType CASCADE = FabricParticleTypes.simple();
-    public static final SimpleParticleType TIDE_SPLASH = FabricParticleTypes.simple();
+    public static final SimpleParticleType BIGSPLASH = FabricParticleTypes.simple();
     public static final SimpleParticleType RIPPLE = FabricParticleTypes.simple();
     public static final SimpleParticleType SPLASH = FabricParticleTypes.simple();
+    public static final SimpleParticleType WAVE = FabricParticleTypes.simple();
+    public static final SimpleParticleType FOAM = FabricParticleTypes.simple();
 
     public static void registerParticles() {
         Registry.register(Registries.PARTICLE_TYPE,
                 Identifier.of("windswept", "cascade"), CASCADE);
         Registry.register(Registries.PARTICLE_TYPE,
-                Identifier.of("windswept", "tide_splash"), TIDE_SPLASH);
+                Identifier.of("windswept", "bigsplash"), BIGSPLASH);
         Registry.register(Registries.PARTICLE_TYPE,
                 Identifier.of("windswept", "ripple"), RIPPLE);
         Registry.register(Registries.PARTICLE_TYPE,
                 Identifier.of("windswept", "splash"), SPLASH);
+        Registry.register(Registries.PARTICLE_TYPE,
+                Identifier.of("windswept", "wave"), WAVE);
+        Registry.register(Registries.PARTICLE_TYPE,
+                Identifier.of("windswept", "foam"), FOAM);
     }
 }

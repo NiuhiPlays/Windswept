@@ -16,7 +16,7 @@ public class SoundSettings {
         SETTINGS.put(SoundEvents.HEAVY_WIND, new SoundConfig(SoundType.STATIC, 0.9f, 1.0f, 0.3f));
         SETTINGS.put(SoundEvents.STORM_WIND, new SoundConfig(SoundType.STATIC, 0.9f, 1.0f, 0.3f));
         // Cascade sound (Directional)
-        SETTINGS.put(SoundEvents.CASCADE, new SoundConfig(SoundType.DIRECTIONAL, 2.0f, 1.0f, 1.5f)); // Increased max volume further
+        SETTINGS.put(SoundEvents.CASCADE, new SoundConfig(SoundType.DIRECTIONAL, 1.0f, 1.0f, 1.5f)); // Increased max volume further
     }
 
     public static SoundConfig getSettings(SoundEvent sound) {

@@ -4,11 +4,11 @@ import net.minecraft.client.particle.*;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.SimpleParticleType;
 
-public class SplashParticle extends SpriteBillboardParticle {
+public class BigSplashParticle extends SpriteBillboardParticle {
     private final SpriteProvider spriteProvider;
     private float animationTimer;
 
-    protected SplashParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider) {
+    protected BigSplashParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider) {
         super(world, x, y, z);
         this.spriteProvider = spriteProvider;
         this.maxAge = 25;
@@ -16,7 +16,7 @@ public class SplashParticle extends SpriteBillboardParticle {
         this.alpha = 1.0f;
 
         // Set initial sprite frame
-        this.setSprite(spriteProvider.getSprite(0, 3));
+        this.setSprite(spriteProvider.getSprite(0, 10));
     }
 
     @Override
@@ -25,8 +25,8 @@ public class SplashParticle extends SpriteBillboardParticle {
 
         // Animate sprite
         this.animationTimer += 0.8f;
-        int frameIndex = ((int) this.animationTimer) % 4;
-        this.setSprite(spriteProvider.getSprite(frameIndex, 3));
+        int frameIndex = ((int) this.animationTimer) % 11;
+        this.setSprite(spriteProvider.getSprite(frameIndex, 10));
 
         // Quick fade
         this.alpha = 0.7f - ((float) this.age / this.maxAge) * 0.6f;
@@ -48,7 +48,7 @@ public class SplashParticle extends SpriteBillboardParticle {
         public Particle createParticle(SimpleParticleType type, ClientWorld world,
                                        double x, double y, double z,
                                        double velocityX, double velocityY, double velocityZ) {
-            return new SplashParticle(world, x, y, z, spriteProvider);
+            return new BigSplashParticle(world, x, y, z, spriteProvider);
         }
     }
 }
