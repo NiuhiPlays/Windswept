@@ -1,4 +1,4 @@
-package com.niuhi.particle.wind;
+package com.niuhi.particle.weather.wind;
 
 import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes;
 import net.minecraft.particle.SimpleParticleType;

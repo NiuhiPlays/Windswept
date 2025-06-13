@@ -8,7 +8,7 @@ import com.niuhi.Windswept;
 import com.niuhi.particle.player.PlayerParticleTypes;
 import com.niuhi.particle.water.WaterParticleTypes;
 import com.niuhi.water.RippleSystem;
-import com.niuhi.wind.WindSystem;
+import com.niuhi.weather.wind.WindSystem;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.MinecraftClient;

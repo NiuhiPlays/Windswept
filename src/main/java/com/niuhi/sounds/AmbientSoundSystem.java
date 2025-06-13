@@ -2,7 +2,7 @@ package com.niuhi.sounds;
 
 import com.niuhi.Windswept;
 import com.niuhi.water.CascadeSystem;
-import com.niuhi.wind.WindSystem;
+import com.niuhi.weather.wind.WindSystem;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.sound.SoundEvent;

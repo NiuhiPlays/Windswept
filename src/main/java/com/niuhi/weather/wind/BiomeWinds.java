@@ -1,4 +1,4 @@
-package com.niuhi.wind;
+package com.niuhi.weather.wind;
 
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.registry.entry.RegistryEntry;

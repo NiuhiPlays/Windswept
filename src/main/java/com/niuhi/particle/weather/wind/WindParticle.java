@@ -1,7 +1,7 @@
-package com.niuhi.particle.wind;
+package com.niuhi.particle.weather.wind;
 
 import com.niuhi.Windswept;
-import com.niuhi.wind.WindSystem;
+import com.niuhi.weather.wind.WindSystem;
 import net.minecraft.client.particle.*;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.LightmapTextureManager;

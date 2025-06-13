@@ -1,7 +1,7 @@
 package com.niuhi.mixin;
 
 import com.niuhi.Windswept;
-import com.niuhi.wind.WindSystem;
+import com.niuhi.weather.wind.WindSystem;
 import net.minecraft.client.particle.SpriteBillboardParticle;
 import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.world.ClientWorld;

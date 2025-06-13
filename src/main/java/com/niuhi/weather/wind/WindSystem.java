@@ -1,7 +1,7 @@
-package com.niuhi.wind;
+package com.niuhi.weather.wind;
 
 import com.niuhi.Windswept;
-import com.niuhi.particle.wind.WindParticleTypes;
+import com.niuhi.particle.weather.wind.WindParticleTypes;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;

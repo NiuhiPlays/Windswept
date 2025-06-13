@@ -2,7 +2,7 @@ package com.niuhi.mixin;
 
 import com.niuhi.Windswept;
 import com.niuhi.particle.water.CascadeParticle;
-import com.niuhi.wind.WindSystem;
+import com.niuhi.weather.wind.WindSystem;
 import net.minecraft.client.particle.SpriteBillboardParticle;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.Vec3d;
