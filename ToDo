@@ -23,9 +23,12 @@ Shit I need to do:
 //ToDo - Make Waves and Splashes work
     Splashes now work on Enities falling into the water to create splashes.
         Might want to change these splashes to work with the Waves instead.
-    Waves need some Rework and more spawn logic.
-        It now spawns really easily, even simple water blocks against a block.
-        Should only work with Large body of water
+    Waves need some Rework
+        Add waves coming onto the shore from further away
+        Add Edge detection so we don't have floating waves in corners etc
+        Add cascade detection
+        Add scale detection, make them bigger on larger bodies of water and large cliffs
+            Make them smaller on cascades & tiny cliffs and small bodies of water
 
 // Settings & Overall stuff
 
@@ -160,3 +163,8 @@ Shit that has been done sofar:
 
 //DONE - Make Own Wind Particle Textures
     Temp Solution used - Scaled based on Wind Type
+
+
+//DONE - Make Waves and Splashes work
+        It now spawns really easily, even simple water blocks against a block.
+        Should only work with Large body of water
