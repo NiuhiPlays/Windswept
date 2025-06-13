@@ -103,23 +103,7 @@ public class WaveSystem {
                             double baseY = checkPos.getY() + 1.0; // At water surface
                             double baseZ = checkPos.getZ() + 0.5 - normalZ * 0.25;
 
-                            // Check for cliff (solid block with height difference)
-                            boolean isCliff = false;
-                            for (Direction dir : Direction.Type.HORIZONTAL) {
-                                BlockPos neighborPos = checkPos.offset(dir);
-                                BlockState neighborState = world.getBlockState(neighborPos);
-                                if (neighborState.isSolidBlock(world, neighborPos) && !neighborState.isOf(Blocks.WATER)) {
-                                    // Check height difference (at least 2 blocks taller)
-                                    int neighborTopY = world.getTopY(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, neighborPos.getX(), neighborPos.getZ());
-                                    if (neighborTopY >= checkPos.getY() + 2) {
-                                        isCliff = true;
-                                        break;
-                                    }
-                                }
-                            }
-
                             // Spawn a group of particles along the shoreline
-                            float alongX = -normalZ; // Perpendicular to normal
                             for (int i = 0; i < PARTICLES_PER_GROUP; i++) {
                                 // Offset along shoreline
                                 float offset = (i - (PARTICLES_PER_GROUP - 1) / 2.0f) * GROUP_SPREAD;
@@ -129,14 +113,30 @@ public class WaveSystem {
                                 // Y variation to prevent Z-fighting
                                 double yOffset = (random.nextFloat() - 0.5f) * Y_OFFSET;
                                 // Calculate spawn position
-                                double px = baseX + alongX * (offset + randomAlong) - normalX * randomNormal;
+                                double px = baseX + -normalZ * (offset + randomAlong) + normalX * randomNormal;
                                 double py = baseY + yOffset;
-                                double pz = baseZ + normalX * (offset + randomAlong) - normalZ * randomNormal;
+                                double pz = baseZ + normalX * (offset + randomAlong) + normalZ * randomNormal;
 
-                                // Spawn Wave particle with cliff flag
-                                world.addParticleClient(WaterParticleTypes.WAVE, px, py, pz, normalX, isCliff ? 1.0 : 0.0, normalZ);
-                                // Spawn Foam particle with cliff flag
-                                world.addParticleClient(WaterParticleTypes.FOAM, px, py, pz, normalX, isCliff ? 1.0 : 0.0, normalZ);
+                                // Per-particle cliff check
+                                boolean particleIsCliff = false;
+                                BlockPos particlePos = new BlockPos((int)px, (int)py, (int)pz);
+                                for (Direction dir : Direction.Type.HORIZONTAL) {
+                                    BlockPos neighborPos = particlePos.offset(dir);
+                                    BlockState neighborState = world.getBlockState(neighborPos);
+                                    if (neighborState.isSolidBlock(world, neighborPos) && !neighborState.isOf(Blocks.WATER)) {
+                                        // Check height difference (at least 2 blocks taller)
+                                        int neighborTopY = world.getTopY(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, neighborPos.getX(), neighborPos.getZ());
+                                        if (neighborTopY >= particlePos.getY() + 2) {
+                                            particleIsCliff = true;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                // Spawn Wave particle with per-particle cliff flag
+                                world.addParticleClient(WaterParticleTypes.WAVE, px, py, pz, normalX, particleIsCliff ? 1.0 : 0.0, normalZ);
+                                // Spawn Foam particle with per-particle cliff flag
+                                world.addParticleClient(WaterParticleTypes.FOAM, px, py, pz, normalX, particleIsCliff ? 1.0 : 0.0, normalZ);
                             }
                         }
                     }
