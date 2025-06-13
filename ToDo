@@ -25,6 +25,7 @@ Shit I need to do:
         Might want to change these splashes to work with the Waves instead.
     Waves need some Rework
         Add waves coming onto the shore from further away
+        Better Cliff Detection
         Add Edge detection so we don't have floating waves in corners etc
         Add cascade detection
         Add scale detection, make them bigger on larger bodies of water and large cliffs
