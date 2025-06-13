@@ -30,6 +30,8 @@ Shit I need to do:
         Add cascade detection
         Add scale detection, make them bigger on larger bodies of water and large cliffs
             Make them smaller on cascades & tiny cliffs and small bodies of water
+        Make waves react to lightlevel, when its dark they are very visable
+        Make waves more curveable when they spawn diagonal
 
 // Settings & Overall stuff
 
@@ -54,6 +56,9 @@ Shit I need to do:
 
 //ToDo - Rework Particle Culling
     (Removed Culling files for now)
+
+//ToDo - Make area detection on particles much less recource intensive
+    They now produce alot of lagg when trying to make the particle radius bigger than 16/32 blocks.
 
 //ToDo - Make Own Wind Particle Textures
         Soft wind
