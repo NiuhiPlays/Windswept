@@ -118,7 +118,7 @@ public class FoamParticle extends SpriteBillboardParticle {
         float minV = this.getMinV();
         float maxV = this.getMaxV();
 
-        // Render quad
+        // Render front face
         buffer.vertex(vertices[0].x(), vertices[0].y(), vertices[0].z())
                 .texture(minU, maxV).color(this.red, this.green, this.blue, this.alpha)
                 .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
@@ -130,6 +130,20 @@ public class FoamParticle extends SpriteBillboardParticle {
                 .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
         buffer.vertex(vertices[3].x(), vertices[3].y(), vertices[3].z())
                 .texture(maxU, maxV).color(this.red, this.green, this.blue, this.alpha)
+                .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
+
+        // Render back face (reverse vertex order)
+        buffer.vertex(vertices[3].x(), vertices[3].y(), vertices[3].z())
+                .texture(maxU, maxV).color(this.red, this.green, this.blue, this.alpha)
+                .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
+        buffer.vertex(vertices[2].x(), vertices[2].y(), vertices[2].z())
+                .texture(maxU, minV).color(this.red, this.green, this.blue, this.alpha)
+                .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
+        buffer.vertex(vertices[1].x(), vertices[1].y(), vertices[1].z())
+                .texture(minU, minV).color(this.red, this.green, this.blue, this.alpha)
+                .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
+        buffer.vertex(vertices[0].x(), vertices[0].y(), vertices[0].z())
+                .texture(minU, maxV).color(this.red, this.green, this.blue, this.alpha)
                 .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
     }
 
