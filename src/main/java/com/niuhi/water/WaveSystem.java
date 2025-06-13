@@ -39,7 +39,7 @@ public class WaveSystem {
 
         BlockPos playerPos = client.player.getBlockPos();
         Random random = world.random;
-        int radius = 16;
+        int radius = 32;
 
         for (int x = -radius; x <= radius; x++) {
             for (int z = -radius; z <= radius; z++) {

@@ -20,7 +20,7 @@ public class FoamParticle extends SpriteBillboardParticle {
         super(world, x, y, z);
         this.spriteProvider = spriteProvider;
         this.maxAge = 50;
-        this.scale = 2.5f;
+        this.scale = 1.5f;
         this.alpha = 1.0f;
         this.velocityX = 0.0; // Lock position
         this.velocityY = 0.0;
