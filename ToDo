@@ -28,6 +28,8 @@ Shit I need to do:
         Add Better Edge detection so we don't have floating waves in corners etc
         Make waves react to light level, when its dark they are very visible
         Make waves curve into waves next to them when they spawn diagonal
+        Better Rotation animation.
+            Move the texture upward in rotation so the texture doesn't stick into the water
 
 // Settings & Overall stuff
 
