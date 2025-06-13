@@ -14,14 +14,16 @@ public class WaveParticle extends SpriteBillboardParticle {
     private float animationTimer;
     private final float directionX; // Normal X from shoreline (points into water)
     private final float directionZ; // Normal Z from shoreline (points into water)
-    private final boolean isCliff; // Flag to indicate if particle is near a cliff
+    private final float cliffHeight; // Height of the cliff in blocks
 
     protected WaveParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider,
-                           double directionX, double isCliff, double directionZ) {
+                           double directionX, double cliffHeight, double directionZ) {
         super(world, x, y, z);
         this.spriteProvider = spriteProvider;
         this.maxAge = 50;
-        this.scale = 1.5f;
+        this.cliffHeight = (float) cliffHeight;
+        // Scale based on cliff height: base scale 0.8f, increase by 0.1f per block, cap at 1.5f
+        this.scale = cliffHeight > 0 ? (float) Math.min(0.8f + 0.1f * cliffHeight, 1.5f) : 0.8f;
         this.alpha = 1.0f;
         this.velocityX = 0.0; // Lock position
         this.velocityY = 0.0;
@@ -30,8 +32,6 @@ public class WaveParticle extends SpriteBillboardParticle {
         float length = (float) Math.sqrt(directionX * directionX + directionZ * directionZ);
         this.directionX = length > 0 ? (float) (directionX / length) : 1.0f;
         this.directionZ = length > 0 ? (float) (directionZ / length) : 0.0f;
-        // Set cliff flag
-        this.isCliff = isCliff > 0.5; // Treat as true if velocityY (repurposed) is 1.0
 
         // Set biome-based color
         int waterColor = world.getBiome(new BlockPos((int)x, (int)y, (int)z)).value().getWaterColor();
@@ -47,8 +47,8 @@ public class WaveParticle extends SpriteBillboardParticle {
     public void tick() {
         super.tick();
 
-        // Animate sprite
-        this.animationTimer += 0.8f;
+        // Animate sprite more slowly
+        this.animationTimer += 0.4f;
         int frameIndex = ((int) this.animationTimer) % 20;
         this.setSprite(spriteProvider.getSprite(frameIndex, 19));
 
@@ -68,17 +68,17 @@ public class WaveParticle extends SpriteBillboardParticle {
         double y = this.y - camera.getPos().y;
         double z = this.z - camera.getPos().z;
 
-        // Define quad size
-        float size = this.getSize(partialTicks) * 0.5f;
+        // Get full scale upfront
+        float size = this.getSize(partialTicks);
 
         // Calculate rotation angle (0 to 90 degrees) if near a cliff
         float rotationAngle = 0.0f;
-        if (isCliff) {
+        if (cliffHeight > 0) {
             float progress = (this.age + partialTicks) / this.maxAge; // 0 to 1 over lifetime
             rotationAngle = progress * (float) Math.toRadians(90); // 0 to 90 degrees in radians
         }
 
-        // Calculate orientation vectors
+        // Calculate orientation vectors with full scale
         Vector3f along = new Vector3f(-directionZ, 0, directionX).normalize().mul(size); // Perpendicular to normal (along shoreline)
         Vector3f forward = new Vector3f(-directionX, 0, -directionZ).normalize().mul(size); // Opposite normal (toward shore)
 
@@ -91,7 +91,7 @@ public class WaveParticle extends SpriteBillboardParticle {
         };
 
         // Apply rotation around the shoreline tangent if near a cliff
-        if (isCliff) {
+        if (cliffHeight > 0) {
             float cos = (float) Math.cos(rotationAngle);
             float sin = (float) Math.sin(rotationAngle);
             float oneMinusCos = 1.0f - cos;
