@@ -63,7 +63,7 @@ public class WindParticle extends SpriteBillboardParticle {
         float z = (float) (this.z - camPos.z);
 
         // Get combined light level using WorldRenderer
-        BlockPos pos = new BlockPos((int)this.x, (int)(this.y + 0.1), (int)this.z);
+        BlockPos pos = new BlockPos((int) Math.floor(this.x), (int) Math.floor(this.y), (int) Math.floor(this.z));
         int light = WorldRenderer.getLightmapCoordinates(world, pos);
 
         Vec3d windDirection = windSystem.getWindDirection();

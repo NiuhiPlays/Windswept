@@ -44,7 +44,7 @@ public class FootprintWetParticle extends SpriteBillboardParticle {
         double z = this.z - camera.getPos().z;
 
         // Get combined light level using WorldRenderer
-        BlockPos pos = new BlockPos((int)this.x, (int)(this.y + 0.1), (int)this.z);
+        BlockPos pos = new BlockPos((int) Math.floor(this.x), (int) Math.floor(this.y), (int) Math.floor(this.z));
         int light = WorldRenderer.getLightmapCoordinates(world, pos);
 
         // Define quad size (half the scale for each side)
