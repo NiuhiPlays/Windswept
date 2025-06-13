@@ -156,7 +156,6 @@ public class FootprintSystem {
         } else if (world.isRaining() && isExposedToRain(world, x, y + 1.5, z)) {
             // If raining and exposed, spawn both wet and block-specific footprint
             world.addParticleClient(PlayerParticleTypes.FOOTPRINT_WET, x, y, z, 0, 0, 0);
-            world.addParticleClient(particleType, x, y, z, 0, 0, 0);
         } else {
             // Otherwise, spawn only block-specific footprint
             world.addParticleClient(particleType, x, y, z, 0, 0, 0);
