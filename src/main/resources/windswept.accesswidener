@@ -2,12 +2,10 @@ accessWidener	v2	named
 
 # Classes
 
-accessible class WorldRenderer
-accessible class CloudRenderer
-accessible class RenderPipelines
+
 
 # Methods
 
-accessible method net/minecraft/client/render/CloudRenderer drawClouds (Lcom/mojang/blaze3d/pipeline/RenderPipeline;FFF)V
+
 
 # Fields
