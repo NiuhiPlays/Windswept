@@ -2,10 +2,11 @@ package com.niuhi.particle.player;
 
 import net.minecraft.client.particle.*;
 import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.SimpleParticleType;
+import net.minecraft.util.math.BlockPos;
 import org.joml.Vector3f;
 
 public class FootprintMuddyParticle extends SpriteBillboardParticle {
@@ -15,9 +16,8 @@ public class FootprintMuddyParticle extends SpriteBillboardParticle {
     protected FootprintMuddyParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider) {
         super(world, x, y, z);
         this.spriteProvider = spriteProvider;
-        this.maxAge = 200 ;
+        this.maxAge = 200;
         this.scale = 0.3f;
-
 
         // Set initial sprite frame
         this.setSprite(spriteProvider.getSprite(0, 1));
@@ -34,13 +34,18 @@ public class FootprintMuddyParticle extends SpriteBillboardParticle {
 
         // Quick fade
         this.alpha = 0.8f - ((float) this.age / this.maxAge) * 0.8f;
-
     }
+
+    @Override
     public void render(VertexConsumer buffer, Camera camera, float partialTicks) {
         // Get particle position relative to camera
         double x = this.x - camera.getPos().x;
         double y = (this.y + 0.01f) - camera.getPos().y;
         double z = this.z - camera.getPos().z;
+
+        // Get combined light level using WorldRenderer
+        BlockPos pos = new BlockPos((int)this.x, (int)(this.y + 0.1), (int)this.z);
+        int light = WorldRenderer.getLightmapCoordinates(world, pos);
 
         // Define quad size (half the scale for each side)
         float size = this.getSize(partialTicks) * 0.5f;
@@ -62,16 +67,16 @@ public class FootprintMuddyParticle extends SpriteBillboardParticle {
         // Render a single quad (flat, facing upward)
         buffer.vertex(vertices[0].x(), vertices[0].y(), vertices[0].z())
                 .texture(minU, maxV).color(this.red, this.green, this.blue, this.alpha)
-                .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
+                .light(light);
         buffer.vertex(vertices[1].x(), vertices[1].y(), vertices[1].z())
                 .texture(minU, minV).color(this.red, this.green, this.blue, this.alpha)
-                .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
+                .light(light);
         buffer.vertex(vertices[2].x(), vertices[2].y(), vertices[2].z())
                 .texture(maxU, minV).color(this.red, this.green, this.blue, this.alpha)
-                .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
+                .light(light);
         buffer.vertex(vertices[3].x(), vertices[3].y(), vertices[3].z())
                 .texture(maxU, maxV).color(this.red, this.green, this.blue, this.alpha)
-                .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
+                .light(light);
     }
 
     @Override

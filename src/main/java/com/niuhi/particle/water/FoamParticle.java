@@ -2,10 +2,11 @@ package com.niuhi.particle.water;
 
 import net.minecraft.client.particle.*;
 import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.SimpleParticleType;
+import net.minecraft.util.math.BlockPos;
 import org.joml.Vector3f;
 
 public class FoamParticle extends SpriteBillboardParticle {
@@ -60,6 +61,10 @@ public class FoamParticle extends SpriteBillboardParticle {
         double x = this.x - camera.getPos().x;
         double y = this.y - camera.getPos().y;
         double z = this.z - camera.getPos().z;
+
+        // Get combined light level using WorldRenderer
+        BlockPos pos = new BlockPos((int)this.x, (int)this.y, (int)this.z);
+        int light = WorldRenderer.getLightmapCoordinates(world, pos);
 
         // Get full scale upfront
         float size = this.getSize(partialTicks);
@@ -121,30 +126,30 @@ public class FoamParticle extends SpriteBillboardParticle {
         // Render front face
         buffer.vertex(vertices[0].x(), vertices[0].y(), vertices[0].z())
                 .texture(minU, maxV).color(this.red, this.green, this.blue, this.alpha)
-                .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
+                .light(light);
         buffer.vertex(vertices[1].x(), vertices[1].y(), vertices[1].z())
                 .texture(minU, minV).color(this.red, this.green, this.blue, this.alpha)
-                .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
+                .light(light);
         buffer.vertex(vertices[2].x(), vertices[2].y(), vertices[2].z())
                 .texture(maxU, minV).color(this.red, this.green, this.blue, this.alpha)
-                .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
+                .light(light);
         buffer.vertex(vertices[3].x(), vertices[3].y(), vertices[3].z())
                 .texture(maxU, maxV).color(this.red, this.green, this.blue, this.alpha)
-                .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
+                .light(light);
 
         // Render back face (reverse vertex order)
         buffer.vertex(vertices[3].x(), vertices[3].y(), vertices[3].z())
                 .texture(maxU, maxV).color(this.red, this.green, this.blue, this.alpha)
-                .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
+                .light(light);
         buffer.vertex(vertices[2].x(), vertices[2].y(), vertices[2].z())
                 .texture(maxU, minV).color(this.red, this.green, this.blue, this.alpha)
-                .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
+                .light(light);
         buffer.vertex(vertices[1].x(), vertices[1].y(), vertices[1].z())
                 .texture(minU, minV).color(this.red, this.green, this.blue, this.alpha)
-                .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
+                .light(light);
         buffer.vertex(vertices[0].x(), vertices[0].y(), vertices[0].z())
                 .texture(minU, maxV).color(this.red, this.green, this.blue, this.alpha)
-                .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
+                .light(light);
     }
 
     public static class Factory implements ParticleFactory<SimpleParticleType> {

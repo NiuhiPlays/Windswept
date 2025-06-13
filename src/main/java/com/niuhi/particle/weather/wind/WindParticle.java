@@ -4,12 +4,13 @@ import com.niuhi.Windswept;
 import com.niuhi.weather.wind.WindSystem;
 import net.minecraft.client.particle.*;
 import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.SimpleParticleType;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.BlockPos;
 import org.joml.Vector3f;
 
 public class WindParticle extends SpriteBillboardParticle {
@@ -61,6 +62,10 @@ public class WindParticle extends SpriteBillboardParticle {
         float y = (float) (this.y - camPos.y);
         float z = (float) (this.z - camPos.z);
 
+        // Get combined light level using WorldRenderer
+        BlockPos pos = new BlockPos((int)this.x, (int)(this.y + 0.1), (int)this.z);
+        int light = WorldRenderer.getLightmapCoordinates(world, pos);
+
         Vec3d windDirection = windSystem.getWindDirection();
         float yaw = (float) MathHelper.atan2(windDirection.z, windDirection.x);
 
@@ -86,29 +91,29 @@ public class WindParticle extends SpriteBillboardParticle {
 
         buffer.vertex(vertices[0].x(), vertices[0].y(), vertices[0].z())
                 .texture(minU, maxV).color(1.0f, 1.0f, 1.0f, this.alpha)
-                .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
+                .light(light);
         buffer.vertex(vertices[1].x(), vertices[1].y(), vertices[1].z())
                 .texture(minU, minV).color(1.0f, 1.0f, 1.0f, this.alpha)
-                .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
+                .light(light);
         buffer.vertex(vertices[2].x(), vertices[2].y(), vertices[2].z())
                 .texture(maxU, minV).color(1.0f, 1.0f, 1.0f, this.alpha)
-                .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
+                .light(light);
         buffer.vertex(vertices[3].x(), vertices[3].y(), vertices[3].z())
                 .texture(maxU, maxV).color(1.0f, 1.0f, 1.0f, this.alpha)
-                .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
+                .light(light);
 
         buffer.vertex(vertices[3].x(), vertices[3].y(), vertices[3].z())
                 .texture(maxU, maxV).color(1.0f, 1.0f, 1.0f, this.alpha)
-                .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
+                .light(light);
         buffer.vertex(vertices[2].x(), vertices[2].y(), vertices[2].z())
                 .texture(maxU, minV).color(1.0f, 1.0f, 1.0f, this.alpha)
-                .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
+                .light(light);
         buffer.vertex(vertices[1].x(), vertices[1].y(), vertices[1].z())
                 .texture(minU, minV).color(1.0f, 1.0f, 1.0f, this.alpha)
-                .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
+                .light(light);
         buffer.vertex(vertices[0].x(), vertices[0].y(), vertices[0].z())
                 .texture(minU, maxV).color(1.0f, 1.0f, 1.0f, this.alpha)
-                .light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
+                .light(light);
     }
 
     @Override
