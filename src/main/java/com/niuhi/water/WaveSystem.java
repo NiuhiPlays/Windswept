@@ -16,6 +16,10 @@ public class WaveSystem {
     private static final int TICK_INTERVAL = 10; // Spawn every 10 ticks
     private static final int MIN_WATER_BLOCKS = 15; // Minimum water blocks for large water body
     private static final int CHECK_RADIUS = 2; // 5x5 area
+    private static final int PARTICLES_PER_GROUP = 4; // Number of particles in a group
+    private static final float GROUP_SPREAD = 0.3f; // Base spread along shoreline (in blocks)
+    private static final float RANDOM_OFFSET = 0.1f; // Random offset for less uniformity
+    private static final float Y_OFFSET = 0.01f; // Max Y variation to prevent Z-fighting
 
     public static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
@@ -58,28 +62,69 @@ public class WaveSystem {
                         continue; // Skip if not at surface height
                     }
 
-                    // Check for land edge
+                    // Check for land edge and compute direction
                     boolean isEdge = false;
                     int waterNeighbors = 0;
+                    float normalX = 0.0f;
+                    float normalZ = 0.0f;
                     for (Direction dir : Direction.Type.HORIZONTAL) {
                         BlockPos neighborPos = checkPos.offset(dir);
                         BlockState neighborState = world.getBlockState(neighborPos);
                         if (neighborState.isSolidBlock(world, neighborPos) && !neighborState.isOf(Blocks.WATER)) {
                             isEdge = true;
+                            // Add opposite direction to normal (pointing into water)
+                            normalX -= dir.getOffsetX();
+                            normalZ -= dir.getOffsetZ();
                         } else if (neighborState.isOf(Blocks.WATER)) {
                             waterNeighbors++;
                         }
                     }
 
+                    // Normalize direction vector
+                    float length = (float) Math.sqrt(normalX * normalX + normalZ * normalZ);
+                    if (length > 0) {
+                        normalX /= length;
+                        normalZ /= length;
+                    } else {
+                        normalX = random.nextFloat() - 0.5f; // Fallback random direction
+                        normalZ = random.nextFloat() - 0.5f;
+                        length = (float) Math.sqrt(normalX * normalX + normalZ * normalZ);
+                        if (length > 0) {
+                            normalX /= length;
+                            normalZ /= length;
+                        }
+                    }
+
                     // Spawn only if it's an edge, not surrounded, and in a large water body
                     if (isEdge && waterNeighbors < 4 && isLargeWaterBody(world, checkPos)) {
-                        double px = checkPos.getX() + random.nextDouble();
-                        double py = checkPos.getY() + 1.05; // Slightly higher spawn
-                        double pz = checkPos.getZ() + random.nextDouble();
-
                         if (random.nextFloat() < 0.3f) {
-                            world.addParticleClient(WaterParticleTypes.WAVE, px, py, pz, 0, 0, 0);
-                            world.addParticleClient(WaterParticleTypes.FOAM, px, py, pz, 0, 0, 0);
+                            // Calculate base spawn position (center of block, offset toward shore)
+                            double baseX = checkPos.getX() + 0.5 - normalX * 0.25; // Offset toward shore
+                            double baseY = checkPos.getY() + 1.0; // At water surface
+                            double baseZ = checkPos.getZ() + 0.5 - normalZ * 0.25;
+
+                            // Spawn a group of particles along the shoreline
+                            float alongX = -normalZ; // Perpendicular to normal
+                            for (int i = 0; i < PARTICLES_PER_GROUP; i++) {
+                                // Offset along shoreline
+                                float offset = (i - (PARTICLES_PER_GROUP - 1) / 2.0f) * GROUP_SPREAD;
+                                // Random offsets for less uniformity
+                                float randomAlong = (random.nextFloat() - 0.5f) * RANDOM_OFFSET;
+                                float randomNormal = (random.nextFloat() - 0.5f) * RANDOM_OFFSET;
+                                // Y variation to prevent Z-fighting
+                                double yOffset = (random.nextFloat() - 0.5f) * Y_OFFSET;
+                                // Calculate spawn position
+                                double px = baseX + alongX * (offset + randomAlong) - normalX * randomNormal;
+                                double py = baseY + yOffset;
+                                double pz = baseZ + normalX * (offset + randomAlong) - normalZ * randomNormal;
+                                // Staggered age for delay effect
+                                int ageOffset = i * 2; // 0, 2, 4, 6 ticks
+
+                                // Spawn Wave particle
+                                world.addParticleClient(WaterParticleTypes.WAVE, px, py, pz, normalX, 0, normalZ);
+                                // Spawn Foam particle
+                                world.addParticleClient(WaterParticleTypes.FOAM, px, py, pz, normalX, 0, normalZ);
+                            }
                         }
                     }
                 }
