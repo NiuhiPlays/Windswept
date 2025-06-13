@@ -15,11 +15,8 @@
 	"icon": "assets/windswept/icon.png",
 	"environment": "*",
 	"entrypoints": {
-		"main": [
-			"com.niuhi.Windswept"
-		],
 		"client": [
-			"com.niuhi.WindsweptClient"
+			"com.niuhi.Windswept"
 		]
 	},
 	"mixins": [
