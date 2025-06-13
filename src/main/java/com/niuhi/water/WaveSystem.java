@@ -13,12 +13,12 @@ import net.minecraft.world.Heightmap;
 
 public class WaveSystem {
     private static int tickCounter = 0;
-    private static final int TICK_INTERVAL = 10; // Spawn every 10 ticks
+    private static final int TICK_INTERVAL = 20; // Spawn every 10 ticks
     private static final int MIN_WATER_BLOCKS = 15; // Minimum water blocks for large water body
     private static final int CHECK_RADIUS = 2; // 5x5 area
     private static final int PARTICLES_PER_GROUP = 4; // Number of particles in a group
     private static final float GROUP_SPREAD = 0.3f; // Base spread along shoreline (in blocks)
-    private static final float RANDOM_OFFSET = 0.1f; // Random offset for less uniformity
+    private static final float RANDOM_OFFSET = 0.15f; // Random offset for less uniformity
     private static final float Y_OFFSET = 0.01f; // Max Y variation to prevent Z-fighting
 
     public static void register() {
@@ -103,6 +103,21 @@ public class WaveSystem {
                             double baseY = checkPos.getY() + 1.0; // At water surface
                             double baseZ = checkPos.getZ() + 0.5 - normalZ * 0.25;
 
+                            // Check for cliff (solid block with height difference)
+                            boolean isCliff = false;
+                            for (Direction dir : Direction.Type.HORIZONTAL) {
+                                BlockPos neighborPos = checkPos.offset(dir);
+                                BlockState neighborState = world.getBlockState(neighborPos);
+                                if (neighborState.isSolidBlock(world, neighborPos) && !neighborState.isOf(Blocks.WATER)) {
+                                    // Check height difference (at least 2 blocks taller)
+                                    int neighborTopY = world.getTopY(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, neighborPos.getX(), neighborPos.getZ());
+                                    if (neighborTopY >= checkPos.getY() + 2) {
+                                        isCliff = true;
+                                        break;
+                                    }
+                                }
+                            }
+
                             // Spawn a group of particles along the shoreline
                             float alongX = -normalZ; // Perpendicular to normal
                             for (int i = 0; i < PARTICLES_PER_GROUP; i++) {
@@ -117,13 +132,11 @@ public class WaveSystem {
                                 double px = baseX + alongX * (offset + randomAlong) - normalX * randomNormal;
                                 double py = baseY + yOffset;
                                 double pz = baseZ + normalX * (offset + randomAlong) - normalZ * randomNormal;
-                                // Staggered age for delay effect
-                                int ageOffset = i * 2; // 0, 2, 4, 6 ticks
 
-                                // Spawn Wave particle
-                                world.addParticleClient(WaterParticleTypes.WAVE, px, py, pz, normalX, 0, normalZ);
-                                // Spawn Foam particle
-                                world.addParticleClient(WaterParticleTypes.FOAM, px, py, pz, normalX, 0, normalZ);
+                                // Spawn Wave particle with cliff flag
+                                world.addParticleClient(WaterParticleTypes.WAVE, px, py, pz, normalX, isCliff ? 1.0 : 0.0, normalZ);
+                                // Spawn Foam particle with cliff flag
+                                world.addParticleClient(WaterParticleTypes.FOAM, px, py, pz, normalX, isCliff ? 1.0 : 0.0, normalZ);
                             }
                         }
                     }
