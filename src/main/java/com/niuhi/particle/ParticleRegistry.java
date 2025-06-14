@@ -20,15 +20,18 @@ public class ParticleRegistry {
         ParticleFactoryRegistry.getInstance().register(WaterParticleTypes.SPLASH, SplashParticle.Factory::new);
         ParticleFactoryRegistry.getInstance().register(WaterParticleTypes.WAVE, WaveParticle.Factory::new);
         ParticleFactoryRegistry.getInstance().register(WaterParticleTypes.FOAM, FoamParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(WaterParticleTypes.WATERSPLASH, WaterSplashParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(WaterParticleTypes.WATERSPLASHFOAM, WaterSplashFoamParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(WaterParticleTypes.WATERSPLASHRING, WaterSplashRingParticle.Factory::new);
 
         // Player Particles
         PlayerParticleTypes.registerParticles();
         ParticleFactoryRegistry.getInstance().register(PlayerParticleTypes.FOOTPRINT, FootprintParticle.Factory::new);
-        ParticleFactoryRegistry.getInstance().register(PlayerParticleTypes.FOOTPRINT_WET, FootprintParticle.Factory::new);
-        ParticleFactoryRegistry.getInstance().register(PlayerParticleTypes.FOOTPRINT_SNOW, FootprintParticle.Factory::new);
-        ParticleFactoryRegistry.getInstance().register(PlayerParticleTypes.FOOTPRINT_MUDDY, FootprintParticle.Factory::new);
-        ParticleFactoryRegistry.getInstance().register(PlayerParticleTypes.FOOTPRINT_SAND, FootprintParticle.Factory::new);
-        ParticleFactoryRegistry.getInstance().register(PlayerParticleTypes.FOOTPRINT_REDSAND, FootprintParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(PlayerParticleTypes.FOOTPRINT_WET, FootprintWetParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(PlayerParticleTypes.FOOTPRINT_SNOW, FootprintSnowParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(PlayerParticleTypes.FOOTPRINT_MUDDY, FootprintMuddyParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(PlayerParticleTypes.FOOTPRINT_SAND, FootprintSandParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(PlayerParticleTypes.FOOTPRINT_REDSAND, FootprintRedSandParticle.Factory::new);
         ParticleFactoryRegistry.getInstance().register(PlayerParticleTypes.DUST_CLOUD, DustCloudParticle.Factory::new);
     }
 }
