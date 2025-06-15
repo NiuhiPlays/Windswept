@@ -43,7 +43,7 @@ public class WaterSplashRingParticle extends SpriteBillboardParticle {
     @Override
     public void tick() {
         super.tick();
-        this.animationTimer += 0.8f;
+        this.animationTimer += 0.6f;
         int frameIndex = ((int) this.animationTimer) % 9;
         this.setSprite(spriteProvider.getSprite(frameIndex, 8));
         this.scale += 0.02f * this.sizeMultiplier; // Expansion for animation

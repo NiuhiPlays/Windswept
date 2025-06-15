@@ -43,7 +43,7 @@ public class WaterSplashParticle extends SpriteBillboardParticle {
         super.tick();
 
         // Play animation only once by clamping the frame index
-        this.animationTimer += 0.8f;
+        this.animationTimer += 0.6f;
         int frameIndex = Math.min(8, (int) this.animationTimer); // Clamp to max frame (8)
         this.setSprite(spriteProvider.getSprite(frameIndex, 8));
 
