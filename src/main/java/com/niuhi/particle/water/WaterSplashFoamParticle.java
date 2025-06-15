@@ -20,7 +20,7 @@ public class WaterSplashFoamParticle extends SpriteBillboardParticle {
         this.spriteProvider = spriteProvider;
         float sizeMultiplier1 = (float) Math.max(0.5, Math.min(2.0, sizeMultiplier));
         this.maxAge = (int) (25 * sizeMultiplier1); // Adjusted lifespan
-        this.scale = sizeMultiplier1 * 1.1f; // Just slightly bigger than bounding box
+        this.scale = sizeMultiplier1; // Exact bounding box size
         this.alpha = 0.9f; // Slightly translucent
 
         // Static particle
@@ -65,8 +65,8 @@ public class WaterSplashFoamParticle extends SpriteBillboardParticle {
         BlockPos pos = new BlockPos((int) Math.floor(this.x), (int) Math.floor(this.y), (int) Math.floor(this.z));
         int light = WorldRenderer.getLightmapCoordinates(world, pos);
 
-        // Define quad size - foam should be slightly larger and taller than main splash
-        float size = this.getSize(partialTicks) * 1.1f;
+        // Define quad size
+        float size = this.getSize(partialTicks);
         float height = size * 1.8f; // Taller foam for dramatic effect
         float halfSize = size * 0.5f;
 
@@ -76,22 +76,22 @@ public class WaterSplashFoamParticle extends SpriteBillboardParticle {
         float minV = this.getMinV();
         float maxV = this.getMaxV();
 
-        // Create 4 vertical foam walls that form a perfect square perimeter
-        // Each wall spans exactly from corner to corner of the bounding box
+        // Create 4 vertical walls that form a perfect square perimeter
+        // Walls are positioned so their edges touch exactly at the corners
 
-        // North wall (spans full bounding box width at +Z edge)
+        // North wall (at +Z edge)
         renderDoubleSidedVerticalWall(buffer, centerX, centerY, centerZ + halfSize,
                 size, height, minU, maxU, minV, maxV, light, 0);
 
-        // South wall (spans full bounding box width at -Z edge)
+        // South wall (at -Z edge)
         renderDoubleSidedVerticalWall(buffer, centerX, centerY, centerZ - halfSize,
                 size, height, minU, maxU, minV, maxV, light, 180);
 
-        // East wall (spans full bounding box depth at +X edge)
+        // East wall (at +X edge)
         renderDoubleSidedVerticalWall(buffer, centerX + halfSize, centerY, centerZ,
                 size, height, minU, maxU, minV, maxV, light, 90);
 
-        // West wall (spans full bounding box depth at -X edge)
+        // West wall (at -X edge)
         renderDoubleSidedVerticalWall(buffer, centerX - halfSize, centerY, centerZ,
                 size, height, minU, maxU, minV, maxV, light, 270);
     }
@@ -99,7 +99,6 @@ public class WaterSplashFoamParticle extends SpriteBillboardParticle {
     private void renderDoubleSidedVerticalWall(VertexConsumer buffer, float centerX, float centerY, float centerZ,
                                                float width, float height, float minU, float maxU, float minV, float maxV,
                                                int light, float yRotation) {
-
         // Render front face
         renderVerticalWall(buffer, centerX, centerY, centerZ, width, height, minU, maxU, minV, maxV, light, yRotation, false);
 
@@ -110,11 +109,10 @@ public class WaterSplashFoamParticle extends SpriteBillboardParticle {
     private void renderVerticalWall(VertexConsumer buffer, float centerX, float centerY, float centerZ,
                                     float width, float height, float minU, float maxU, float minV, float maxV,
                                     int light, float yRotation, boolean reversed) {
-
         float halfWidth = width * 0.5f;
         float halfHeight = height * 0.5f;
 
-        // Create vertices for a vertical quad
+        // Create vertices for a vertical quad, ensuring corners touch
         Vector3f[] vertices = new Vector3f[]{
                 new Vector3f(-halfWidth, -halfHeight, 0), // Bottom-left
                 new Vector3f(-halfWidth, halfHeight, 0),  // Top-left

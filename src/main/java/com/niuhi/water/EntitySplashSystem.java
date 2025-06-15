@@ -4,7 +4,6 @@ import com.niuhi.particle.water.WaterParticleTypes;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.registry.tag.FluidTags;
@@ -30,9 +29,8 @@ public class EntitySplashSystem {
 
             // Check all entities in the world
             for (Entity entity : world.getEntities()) {
-                // Skip if not a valid entity type, or if it's the player in spectator mode
-                if (!(entity instanceof ProjectileEntity || entity.isLiving()) ||
-                        (entity == client.player && client.player.isSpectator())) {
+                // Skip if it's the player in spectator mode
+                if (entity == client.player && client.player.isSpectator()) {
                     continue;
                 }
 
@@ -66,13 +64,13 @@ public class EntitySplashSystem {
                     // Update last spawn time
                     lastSpawnTime.put(entity, currentTime);
 
-                    // Calculate splash size based on entity's bounding box (just slightly bigger)
+                    // Calculate splash size based on entity's bounding box
                     Box boundingBox = entity.getBoundingBox();
                     double width = boundingBox.getLengthX();
                     double depth = boundingBox.getLengthZ();
 
-                    // Use the larger dimension (width or depth) and add 10% for slight expansion
-                    double baseSplashSize = Math.max(width, depth) * 1.1;
+                    // Use the larger dimension (width or depth) as the exact size
+                    double baseSplashSize = Math.max(width, depth);
 
                     // Clamp size to reasonable limits
                     double sizeMultiplier = Math.max(0.5, Math.min(2.0, baseSplashSize));
