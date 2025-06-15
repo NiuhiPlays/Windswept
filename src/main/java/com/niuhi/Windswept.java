@@ -29,6 +29,7 @@ public class Windswept implements ClientModInitializer {
 		RippleSystem.register();
 		WaveSystem.register();
 		SplashSystem.register();
+		EntitySplashSystem.register();
 
 		// Player Systems
 		FootprintSystem.register();
