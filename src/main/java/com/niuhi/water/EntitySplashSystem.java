@@ -10,6 +10,8 @@ import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.Heightmap;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -75,17 +77,15 @@ public class EntitySplashSystem {
                     // Clamp size to reasonable limits
                     double sizeMultiplier = Math.max(0.5, Math.min(2.0, baseSplashSize));
 
-                    // Get water surface position
+                    // Find water surface position
                     BlockPos pos = new BlockPos((int) Math.floor(entity.getX()),
                             (int) Math.floor(entity.getY()),
                             (int) Math.floor(entity.getZ()));
-                    FluidState fluidState = world.getFluidState(pos);
+                    double waterSurfaceY = getWaterSurfaceHeight(world, pos);
 
-                    if (fluidState.isOf(Fluids.WATER)) {
-                        double waterSurfaceY = pos.getY() + fluidState.getHeight(world, pos) + 0.02;
-
-                        // Spawn single particles when entering water
-                        spawnSplashParticles(world, entity.getX(), waterSurfaceY, entity.getZ(), sizeMultiplier);
+                    if (waterSurfaceY != Double.MIN_VALUE) {
+                        // Spawn single particles at the water surface
+                        spawnSplashParticles(world, entity.getX(), waterSurfaceY + 0.02, entity.getZ(), sizeMultiplier);
                     }
                 }
 
@@ -106,6 +106,34 @@ public class EntitySplashSystem {
                 (int) Math.floor(entity.getZ()));
         FluidState fluidState = entity.getWorld().getFluidState(pos);
         return fluidState.isIn(FluidTags.WATER);
+    }
+
+    private static double getWaterSurfaceHeight(ClientWorld world, BlockPos pos) {
+        // Get the topmost exposed block using heightmap
+        int topY = world.getTopY(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, pos.getX(), pos.getZ());
+        BlockPos surfacePos = new BlockPos(pos.getX(), topY - 1, pos.getZ());
+
+        // Check if the surface position is water
+        FluidState fluidState = world.getFluidState(surfacePos);
+        if (fluidState.isOf(Fluids.WATER)) {
+            // Ensure the block above is air or non-solid to confirm exposure
+            BlockPos abovePos = surfacePos.up();
+            if (world.getBlockState(abovePos).isAir() || !world.getBlockState(abovePos).isSolidBlock(world, abovePos)) {
+                return surfacePos.getY() + fluidState.getHeight(world, surfacePos);
+            }
+        }
+
+        // If not water at topY - 1, check one block below
+        surfacePos = surfacePos.down();
+        fluidState = world.getFluidState(surfacePos);
+        if (fluidState.isOf(Fluids.WATER)) {
+            BlockPos abovePos = surfacePos.up();
+            if (world.getBlockState(abovePos).isAir() || !world.getBlockState(abovePos).isSolidBlock(world, abovePos)) {
+                return surfacePos.getY() + fluidState.getHeight(world, surfacePos);
+            }
+        }
+
+        return Double.MIN_VALUE; // No valid water surface found
     }
 
     private static void spawnSplashParticles(ClientWorld world, double x, double y, double z, double sizeMultiplier) {
