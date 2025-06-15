@@ -13,12 +13,14 @@ import org.joml.Vector3f;
 public class WaterSplashFoamParticle extends SpriteBillboardParticle {
     private final SpriteProvider spriteProvider;
     private float animationTimer;
+    private final float heightMultiplier;
 
     protected WaterSplashFoamParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider,
-                                      double sizeMultiplier) {
+                                      double sizeMultiplier, double heightMultiplier) {
         super(world, x, y + 0.2, z); // Above surface
         this.spriteProvider = spriteProvider;
         float sizeMultiplier1 = (float) Math.max(0.5, Math.min(2.0, sizeMultiplier));
+        this.heightMultiplier = (float) Math.max(1.0, Math.min(3.0, heightMultiplier));
         this.maxAge = (int) (25 * sizeMultiplier1); // Adjusted lifespan
         this.scale = sizeMultiplier1; // Exact bounding box size
         this.alpha = 0.9f; // Slightly translucent
@@ -67,7 +69,7 @@ public class WaterSplashFoamParticle extends SpriteBillboardParticle {
 
         // Define quad size
         float size = this.getSize(partialTicks);
-        float height = size * 1.8f; // Taller foam for dramatic effect
+        float height = size * 1.8f * this.heightMultiplier; // Scale height by velocity
         float halfSize = size * 0.5f;
 
         // Get UV coordinates
@@ -77,32 +79,20 @@ public class WaterSplashFoamParticle extends SpriteBillboardParticle {
         float maxV = this.getMaxV();
 
         // Create 4 vertical walls that form a perfect square perimeter
-        // Walls are positioned so their edges touch exactly at the corners
-
-        // North wall (at +Z edge)
         renderDoubleSidedVerticalWall(buffer, centerX, centerY, centerZ + halfSize,
-                size, height, minU, maxU, minV, maxV, light, 0);
-
-        // South wall (at -Z edge)
+                size, height, minU, maxU, minV, maxV, light, 0); // North
         renderDoubleSidedVerticalWall(buffer, centerX, centerY, centerZ - halfSize,
-                size, height, minU, maxU, minV, maxV, light, 180);
-
-        // East wall (at +X edge)
+                size, height, minU, maxU, minV, maxV, light, 180); // South
         renderDoubleSidedVerticalWall(buffer, centerX + halfSize, centerY, centerZ,
-                size, height, minU, maxU, minV, maxV, light, 90);
-
-        // West wall (at -X edge)
+                size, height, minU, maxU, minV, maxV, light, 90); // East
         renderDoubleSidedVerticalWall(buffer, centerX - halfSize, centerY, centerZ,
-                size, height, minU, maxU, minV, maxV, light, 270);
+                size, height, minU, maxU, minV, maxV, light, 270); // West
     }
 
     private void renderDoubleSidedVerticalWall(VertexConsumer buffer, float centerX, float centerY, float centerZ,
                                                float width, float height, float minU, float maxU, float minV, float maxV,
                                                int light, float yRotation) {
-        // Render front face
         renderVerticalWall(buffer, centerX, centerY, centerZ, width, height, minU, maxU, minV, maxV, light, yRotation, false);
-
-        // Render back face (reversed winding order)
         renderVerticalWall(buffer, centerX, centerY, centerZ, width, height, minU, maxU, minV, maxV, light, yRotation, true);
     }
 
@@ -112,18 +102,18 @@ public class WaterSplashFoamParticle extends SpriteBillboardParticle {
         float halfWidth = width * 0.5f;
         float halfHeight = height * 0.5f;
 
-        // Create vertices for a vertical quad, ensuring corners touch
-        Vector3f[] vertices = new Vector3f[]{
+        // Define vertices for a vertical quad (before rotation)
+        Vector3f[] vertices = new Vector3f[] {
                 new Vector3f(-halfWidth, -halfHeight, 0), // Bottom-left
                 new Vector3f(-halfWidth, halfHeight, 0),  // Top-left
                 new Vector3f(halfWidth, halfHeight, 0),   // Top-right
                 new Vector3f(halfWidth, -halfHeight, 0)   // Bottom-right
         };
 
-        // Apply Y rotation to face the correct direction
-        float radians = (float)Math.toRadians(yRotation);
-        float cos = (float)Math.cos(radians);
-        float sin = (float)Math.sin(radians);
+        // Apply Y rotation
+        float radians = (float) Math.toRadians(yRotation);
+        float cos = (float) Math.cos(radians);
+        float sin = (float) Math.sin(radians);
 
         for (Vector3f vertex : vertices) {
             float x = vertex.x();
@@ -135,46 +125,19 @@ public class WaterSplashFoamParticle extends SpriteBillboardParticle {
             );
         }
 
-        // Render the vertical wall quad with slightly reduced alpha for layering effect
-        float alpha = this.alpha * 0.8f; // Slightly more transparent for foam layering
+        // Render quad with adjusted alpha for foam
+        float alpha = this.alpha * 0.8f;
 
-        // Render with proper winding order
         if (!reversed) {
-            // Front face - normal winding order
-            buffer.vertex(vertices[0].x(), vertices[0].y(), vertices[0].z())
-                    .texture(minU, maxV)
-                    .color(this.red, this.green, this.blue, alpha)
-                    .light(light);
-            buffer.vertex(vertices[1].x(), vertices[1].y(), vertices[1].z())
-                    .texture(minU, minV)
-                    .color(this.red, this.green, this.blue, alpha)
-                    .light(light);
-            buffer.vertex(vertices[2].x(), vertices[2].y(), vertices[2].z())
-                    .texture(maxU, minV)
-                    .color(this.red, this.green, this.blue, alpha)
-                    .light(light);
-            buffer.vertex(vertices[3].x(), vertices[3].y(), vertices[3].z())
-                    .texture(maxU, maxV)
-                    .color(this.red, this.green, this.blue, alpha)
-                    .light(light);
+            buffer.vertex(vertices[0].x(), vertices[0].y(), vertices[0].z()).texture(minU, maxV).color(this.red, this.green, this.blue, alpha).light(light);
+            buffer.vertex(vertices[1].x(), vertices[1].y(), vertices[1].z()).texture(minU, minV).color(this.red, this.green, this.blue, alpha).light(light);
+            buffer.vertex(vertices[2].x(), vertices[2].y(), vertices[2].z()).texture(maxU, minV).color(this.red, this.green, this.blue, alpha).light(light);
+            buffer.vertex(vertices[3].x(), vertices[3].y(), vertices[3].z()).texture(maxU, maxV).color(this.red, this.green, this.blue, alpha).light(light);
         } else {
-            // Back face - reversed winding order
-            buffer.vertex(vertices[3].x(), vertices[3].y(), vertices[3].z())
-                    .texture(maxU, maxV)
-                    .color(this.red, this.green, this.blue, alpha)
-                    .light(light);
-            buffer.vertex(vertices[2].x(), vertices[2].y(), vertices[2].z())
-                    .texture(maxU, minV)
-                    .color(this.red, this.green, this.blue, alpha)
-                    .light(light);
-            buffer.vertex(vertices[1].x(), vertices[1].y(), vertices[1].z())
-                    .texture(minU, minV)
-                    .color(this.red, this.green, this.blue, alpha)
-                    .light(light);
-            buffer.vertex(vertices[0].x(), vertices[0].y(), vertices[0].z())
-                    .texture(minU, maxV)
-                    .color(this.red, this.green, this.blue, alpha)
-                    .light(light);
+            buffer.vertex(vertices[3].x(), vertices[3].y(), vertices[3].z()).texture(maxU, maxV).color(this.red, this.green, this.blue, alpha).light(light);
+            buffer.vertex(vertices[2].x(), vertices[2].y(), vertices[2].z()).texture(maxU, minV).color(this.red, this.green, this.blue, alpha).light(light);
+            buffer.vertex(vertices[1].x(), vertices[1].y(), vertices[1].z()).texture(minU, minV).color(this.red, this.green, this.blue, alpha).light(light);
+            buffer.vertex(vertices[0].x(), vertices[0].y(), vertices[0].z()).texture(minU, maxV).color(this.red, this.green, this.blue, alpha).light(light);
         }
     }
 
@@ -189,7 +152,7 @@ public class WaterSplashFoamParticle extends SpriteBillboardParticle {
         public Particle createParticle(SimpleParticleType type, ClientWorld world,
                                        double x, double y, double z,
                                        double velocityX, double velocityY, double velocityZ) {
-            return new WaterSplashFoamParticle(world, x, y, z, spriteProvider, velocityX);
+            return new WaterSplashFoamParticle(world, x, y, z, spriteProvider, velocityX, velocityY);
         }
     }
 }

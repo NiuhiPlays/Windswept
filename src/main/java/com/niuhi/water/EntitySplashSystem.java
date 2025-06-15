@@ -20,7 +20,9 @@ public class EntitySplashSystem {
     private static final long SPAWN_COOLDOWN = 10; // 10-tick cooldown per entity
     private static final Map<Entity, Long> lastSpawnTime = new HashMap<>();
     private static final Map<Entity, Boolean> wasInWater = new HashMap<>(); // Track previous water state
-    private static final double MIN_VELOCITY_THRESHOLD = 0.3; // Minimum velocity to create splash
+    private static final double MIN_VELOCITY_THRESHOLD = 0.25; // Minimum velocity to create splash
+    private static final double MAX_HEIGHT_MULTIPLIER = 3.0; // Max height multiplier for high velocity
+    private static final double HEIGHT_SCALING_FACTOR = 1.5; // Scales velocity to height multiplier
 
     public static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
@@ -77,6 +79,10 @@ public class EntitySplashSystem {
                     // Clamp size to reasonable limits
                     double sizeMultiplier = Math.max(0.5, Math.min(2.0, baseSplashSize));
 
+                    // Calculate height multiplier based on velocity
+                    double heightMultiplier = 1.0 + (velocityMagnitude - MIN_VELOCITY_THRESHOLD) * HEIGHT_SCALING_FACTOR;
+                    heightMultiplier = Math.min(heightMultiplier, MAX_HEIGHT_MULTIPLIER);
+
                     // Find water surface position
                     BlockPos pos = new BlockPos((int) Math.floor(entity.getX()),
                             (int) Math.floor(entity.getY()),
@@ -85,7 +91,7 @@ public class EntitySplashSystem {
 
                     if (waterSurfaceY != Double.MIN_VALUE) {
                         // Spawn single particles at the water surface
-                        spawnSplashParticles(world, entity.getX(), waterSurfaceY + 0.02, entity.getZ(), sizeMultiplier);
+                        spawnSplashParticles(world, entity.getX(), waterSurfaceY + 0.5, entity.getZ(), sizeMultiplier, heightMultiplier);
                     }
                 }
 
@@ -136,18 +142,18 @@ public class EntitySplashSystem {
         return Double.MIN_VALUE; // No valid water surface found
     }
 
-    private static void spawnSplashParticles(ClientWorld world, double x, double y, double z, double sizeMultiplier) {
+    private static void spawnSplashParticles(ClientWorld world, double x, double y, double z, double sizeMultiplier, double heightMultiplier) {
         // Spawn exactly one of each particle type at the center position
         world.addParticleClient(WaterParticleTypes.WATERSPLASH,
                 x, y, z,
-                sizeMultiplier, 0.0, 0.0);
+                sizeMultiplier, heightMultiplier, 0.0);
 
         world.addParticleClient(WaterParticleTypes.WATERSPLASHFOAM,
                 x, y, z,
-                sizeMultiplier, 0.0, 0.0);
+                sizeMultiplier, heightMultiplier, 0.0);
 
         world.addParticleClient(WaterParticleTypes.WATERSPLASHRING,
                 x, y, z,
-                sizeMultiplier, 0.0, 0.0);
+                sizeMultiplier, 0.0, 0.0); // Ring doesn't use height multiplier
     }
 }
