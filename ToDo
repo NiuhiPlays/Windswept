@@ -21,8 +21,6 @@ Shit I need to do:
     Entity Splashes
 
 //ToDo - Make Waves and Splashes work
-    Splashes now work on Entities falling into the water to create splashes.
-        Might want to change these splashes to work with the Waves instead.
     Waves need some Rework
         Add waves coming onto the shore from further away
         Add Better Edge detection so we don't have floating waves in corners etc
@@ -185,3 +183,5 @@ Shit that has been done sofar:
             Make them smaller on cascades & tiny cliffs and small bodies of water
         Add Edge detection
         Make waves react to light level, when its dark they are very visible
+    Splashes now work on Entities falling into the water to create splashes.
+        Might want to change these splashes to work with the Waves instead.
