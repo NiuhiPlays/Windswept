@@ -4,6 +4,7 @@ import com.niuhi.particle.water.WaterParticleTypes;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.util.math.BlockPos;
@@ -15,13 +16,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class EntitySplashSystem {
-    private static final int CHECK_INTERVAL = 2; // Check every 2 ticks
-    private static final long SPAWN_COOLDOWN = 10; // 10-tick cooldown per entity
+    private static final long SPAWN_COOLDOWN = 10; // 10-tick cooldown for non-item entities
     private static final Map<Entity, Long> lastSpawnTime = new HashMap<>();
     private static final Map<Entity, Boolean> wasAtWaterSurface = new HashMap<>(); // Track if entity was at water surface
     private static final double MIN_VELOCITY_THRESHOLD = 0.25; // Minimum velocity to create splash
     private static final double MAX_HEIGHT_MULTIPLIER = 3.0; // Max height multiplier for high velocity
     private static final double HEIGHT_SCALING_FACTOR = 1.5; // Scales velocity to height multiplier
+    private static final double ITEM_SURFACE_THRESHOLD = 0.1; // Threshold for items
+    private static final double ENTITY_SURFACE_THRESHOLD = 0.1; // Tighter threshold for non-item entities
 
     public static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
@@ -30,22 +32,17 @@ public class EntitySplashSystem {
                 return;
             }
 
-            // Check all entities in the world
+            // Check all entities in the world every tick
             for (Entity entity : world.getEntities()) {
                 // Skip if it's the player in spectator mode
                 if (entity == client.player && client.player.isSpectator()) {
                     continue;
                 }
 
-                // Check every CHECK_INTERVAL ticks
-                if (world.getTime() % CHECK_INTERVAL != 0) {
-                    continue;
-                }
-
                 boolean currentlyAtWaterSurface = isEntityAtWaterSurface(entity);
                 boolean previouslyAtWaterSurface = wasAtWaterSurface.getOrDefault(entity, false);
 
-                // Only spawn particles when entity ENTERS water surface (transition to surface)
+                // Only spawn particles when entity ENTERS water surface
                 if (currentlyAtWaterSurface && !previouslyAtWaterSurface) {
                     // Check velocity threshold - only splash if moving fast enough
                     Vec3d velocity = entity.getVelocity();
@@ -56,16 +53,16 @@ public class EntitySplashSystem {
                         continue;
                     }
 
-                    // Check cooldown
-                    long currentTime = world.getTime();
-                    long lastSpawn = lastSpawnTime.getOrDefault(entity, 0L);
-                    if (currentTime - lastSpawn < SPAWN_COOLDOWN) {
-                        wasAtWaterSurface.put(entity, true);
-                        continue;
+                    // Apply cooldown only for non-item entities
+                    if (!(entity instanceof ItemEntity)) {
+                        long currentTime = world.getTime();
+                        long lastSpawn = lastSpawnTime.getOrDefault(entity, 0L);
+                        if (currentTime - lastSpawn < SPAWN_COOLDOWN) {
+                            wasAtWaterSurface.put(entity, true);
+                            continue;
+                        }
+                        lastSpawnTime.put(entity, currentTime);
                     }
-
-                    // Update last spawn time
-                    lastSpawnTime.put(entity, currentTime);
 
                     // Calculate splash size based on entity's bounding box
                     Box boundingBox = entity.getBoundingBox();
@@ -106,10 +103,9 @@ public class EntitySplashSystem {
 
     private static boolean isEntityAtWaterSurface(Entity entity) {
         ClientWorld world = (ClientWorld) entity.getWorld();
-        // Get the entity's eye position (center of entity) and block position
-        double eyeY = entity.getY() + entity.getEyeHeight(entity.getPose());
+        // Get the entity's block position
         BlockPos pos = new BlockPos((int) Math.floor(entity.getX()),
-                (int) Math.floor(eyeY),
+                (int) Math.floor(entity.getY()),
                 (int) Math.floor(entity.getZ()));
 
         // Get water surface height
@@ -118,9 +114,21 @@ public class EntitySplashSystem {
             return false;
         }
 
-        // Check if the entity's eye or feet are near the water surface (within 0.5 blocks)
-        double feetY = entity.getY();
-        return Math.abs(waterSurfaceY - eyeY) <= 0.5 || Math.abs(waterSurfaceY - feetY) <= 0.5;
+        // Get the bottom of the entity's bounding box
+        double bottomY = entity.getY();
+
+        if (entity instanceof ItemEntity) {
+            // For items, require the bottom of the bounding box to be at or below the water surface
+            return bottomY <= waterSurfaceY + ITEM_SURFACE_THRESHOLD;
+        } else {
+            // For non-item entities, require the bottom of the bounding box to be at or below the water surface
+            // and confirm the block at the feet position contains water
+            BlockPos feetPos = new BlockPos((int) Math.floor(entity.getX()),
+                    (int) Math.floor(bottomY),
+                    (int) Math.floor(entity.getZ()));
+            FluidState fluidState = world.getFluidState(feetPos);
+            return bottomY <= waterSurfaceY + ENTITY_SURFACE_THRESHOLD && fluidState.isIn(FluidTags.WATER);
+        }
     }
 
     private static double getWaterSurfaceHeight(ClientWorld world, BlockPos pos) {
