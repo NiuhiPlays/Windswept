@@ -5,7 +5,6 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -19,7 +18,7 @@ public class EntitySplashSystem {
     private static final int CHECK_INTERVAL = 2; // Check every 2 ticks
     private static final long SPAWN_COOLDOWN = 10; // 10-tick cooldown per entity
     private static final Map<Entity, Long> lastSpawnTime = new HashMap<>();
-    private static final Map<Entity, Boolean> wasInWater = new HashMap<>(); // Track previous water state
+    private static final Map<Entity, Boolean> wasAtWaterSurface = new HashMap<>(); // Track if entity was at water surface
     private static final double MIN_VELOCITY_THRESHOLD = 0.25; // Minimum velocity to create splash
     private static final double MAX_HEIGHT_MULTIPLIER = 3.0; // Max height multiplier for high velocity
     private static final double HEIGHT_SCALING_FACTOR = 1.5; // Scales velocity to height multiplier
@@ -43,17 +42,17 @@ public class EntitySplashSystem {
                     continue;
                 }
 
-                boolean currentlyInWater = isEntityInWater(entity);
-                boolean previouslyInWater = wasInWater.getOrDefault(entity, false);
+                boolean currentlyAtWaterSurface = isEntityAtWaterSurface(entity);
+                boolean previouslyAtWaterSurface = wasAtWaterSurface.getOrDefault(entity, false);
 
-                // Only spawn particles when entity ENTERS water (transition from not in water to in water)
-                if (currentlyInWater && !previouslyInWater) {
+                // Only spawn particles when entity ENTERS water surface (transition to surface)
+                if (currentlyAtWaterSurface && !previouslyAtWaterSurface) {
                     // Check velocity threshold - only splash if moving fast enough
                     Vec3d velocity = entity.getVelocity();
                     double velocityMagnitude = velocity.length();
 
                     if (velocityMagnitude < MIN_VELOCITY_THRESHOLD) {
-                        wasInWater.put(entity, currentlyInWater);
+                        wasAtWaterSurface.put(entity, true);
                         continue;
                     }
 
@@ -61,7 +60,7 @@ public class EntitySplashSystem {
                     long currentTime = world.getTime();
                     long lastSpawn = lastSpawnTime.getOrDefault(entity, 0L);
                     if (currentTime - lastSpawn < SPAWN_COOLDOWN) {
-                        wasInWater.put(entity, currentlyInWater);
+                        wasAtWaterSurface.put(entity, true);
                         continue;
                     }
 
@@ -95,51 +94,55 @@ public class EntitySplashSystem {
                     }
                 }
 
-                // Update water state tracking
-                wasInWater.put(entity, currentlyInWater);
+                // Update water surface state tracking
+                wasAtWaterSurface.put(entity, currentlyAtWaterSurface);
             }
 
             // Clean up old entries for dead entities
             lastSpawnTime.entrySet().removeIf(entry -> !entry.getKey().isAlive());
-            wasInWater.entrySet().removeIf(entry -> !entry.getKey().isAlive());
+            wasAtWaterSurface.entrySet().removeIf(entry -> !entry.getKey().isAlive());
         });
     }
 
-    private static boolean isEntityInWater(Entity entity) {
-        // Check if entity's center is in water
+    private static boolean isEntityAtWaterSurface(Entity entity) {
+        ClientWorld world = (ClientWorld) entity.getWorld();
+        // Get the entity's eye position (center of entity) and block position
+        double eyeY = entity.getY() + entity.getEyeHeight(entity.getPose());
         BlockPos pos = new BlockPos((int) Math.floor(entity.getX()),
-                (int) Math.floor(entity.getY()),
+                (int) Math.floor(eyeY),
                 (int) Math.floor(entity.getZ()));
-        FluidState fluidState = entity.getWorld().getFluidState(pos);
-        return fluidState.isIn(FluidTags.WATER);
+
+        // Get water surface height
+        double waterSurfaceY = getWaterSurfaceHeight(world, pos);
+        if (waterSurfaceY == Double.MIN_VALUE) {
+            return false;
+        }
+
+        // Check if the entity's eye or feet are near the water surface (within 0.5 blocks)
+        double feetY = entity.getY();
+        return Math.abs(waterSurfaceY - eyeY) <= 0.5 || Math.abs(waterSurfaceY - feetY) <= 0.5;
     }
 
     private static double getWaterSurfaceHeight(ClientWorld world, BlockPos pos) {
-        // Get the topmost exposed block using heightmap
+        // Start at the heightmap's top position
         int topY = world.getTopY(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, pos.getX(), pos.getZ());
-        BlockPos surfacePos = new BlockPos(pos.getX(), topY - 1, pos.getZ());
+        BlockPos checkPos;
 
-        // Check if the surface position is water
-        FluidState fluidState = world.getFluidState(surfacePos);
-        if (fluidState.isOf(Fluids.WATER)) {
-            // Ensure the block above is air or non-solid to confirm exposure
-            BlockPos abovePos = surfacePos.up();
-            if (world.getBlockState(abovePos).isAir() || !world.getBlockState(abovePos).isSolidBlock(world, abovePos)) {
-                return surfacePos.getY() + fluidState.getHeight(world, surfacePos);
+        // Search downward from topY to find the water surface
+        for (int y = topY; y >= world.getBottomY(); y--) {
+            checkPos = new BlockPos(pos.getX(), y, pos.getZ());
+            FluidState fluidState = world.getFluidState(checkPos);
+            if (fluidState.isIn(FluidTags.WATER)) {
+                // Found water: check if the block above is not water to confirm surface
+                BlockPos abovePos = checkPos.up();
+                FluidState aboveFluid = world.getFluidState(abovePos);
+                if (!aboveFluid.isIn(FluidTags.WATER)) {
+                    return checkPos.getY() + fluidState.getHeight(world, checkPos);
+                }
             }
         }
 
-        // If not water at topY - 1, check one block below
-        surfacePos = surfacePos.down();
-        fluidState = world.getFluidState(surfacePos);
-        if (fluidState.isOf(Fluids.WATER)) {
-            BlockPos abovePos = surfacePos.up();
-            if (world.getBlockState(abovePos).isAir() || !world.getBlockState(abovePos).isSolidBlock(world, abovePos)) {
-                return surfacePos.getY() + fluidState.getHeight(world, surfacePos);
-            }
-        }
-
-        return Double.MIN_VALUE; // No valid water surface found
+        return Double.MIN_VALUE; // No water surface found
     }
 
     private static void spawnSplashParticles(ClientWorld world, double x, double y, double z, double sizeMultiplier, double heightMultiplier) {
