@@ -18,7 +18,11 @@ Shit I need to do:
 
 //ToDo - Water Particles, like Effective / Particular & Tidal
     Wakes
-    Entity Splashes
+
+//ToDo - Entity Splashes
+    Currently only spawn on surface water, rework water detection, maybe mixin?
+    Part of the splash spawns underwater
+    Particle age should be lookat more, at high velocities it lasts a bit to long
 
 //ToDo - Make Waves and Splashes work
     Waves need some Rework
@@ -149,6 +153,7 @@ Shit that has been done sofar:
     Item/Entity - Ripples
     Tides/ waves
     Splashes
+    Entity Splashes
 
 //DONE - Player particles
     Footsteps (Also Animals & Mobs)
