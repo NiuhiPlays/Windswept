@@ -21,7 +21,7 @@ public class WaterSplashParticle extends SpriteBillboardParticle {
         this.spriteProvider = spriteProvider;
         float sizeMultiplier1 = (float) Math.max(0.5, Math.min(2.0, sizeMultiplier));
         this.heightMultiplier = (float) Math.max(1.0, Math.min(3.0, heightMultiplier));
-        this.maxAge = (int) (25 * sizeMultiplier1); // Adjusted lifespan
+        this.maxAge = (int) (35 * sizeMultiplier1); // Adjusted lifespan
         this.scale = sizeMultiplier1; // Exact bounding box size
         this.alpha = 0.9f; // Slightly translucent
 

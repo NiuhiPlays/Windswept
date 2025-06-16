@@ -91,7 +91,7 @@ public class EntitySplashSystem {
 
                     if (waterSurfaceY != Double.MIN_VALUE) {
                         // Spawn single particles at the water surface
-                        spawnSplashParticles(world, entity.getX(), waterSurfaceY + 0.5, entity.getZ(), sizeMultiplier, heightMultiplier);
+                        spawnSplashParticles(world, entity.getX(), waterSurfaceY + 0.01, entity.getZ(), sizeMultiplier, heightMultiplier);
                     }
                 }
 

@@ -21,7 +21,7 @@ public class WaterSplashRingParticle extends SpriteBillboardParticle {
         super(world, x, y, z);
         this.spriteProvider = spriteProvider;
         this.sizeMultiplier = (float) Math.max(0.8, Math.min(3.0, sizeMultiplier));
-        this.maxAge = (int) (20 * this.sizeMultiplier); // Matched lifespan
+        this.maxAge = (int) (35 * this.sizeMultiplier); // Matched lifespan
         this.scale = 0.8f * this.sizeMultiplier; // Larger size for base
         this.alpha = 0.9f; // Slightly translucent
 
