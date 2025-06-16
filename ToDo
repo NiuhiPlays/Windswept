@@ -22,7 +22,7 @@ Shit I need to do:
 //ToDo - Entity Splashes
     Currently only spawn on surface water, rework water detection, maybe mixin?
     Part of the splash spawns underwater
-    Particle age should be lookat more, at high velocities it lasts a bit to long
+    Particle age should be look at more, at high velocities it lasts a bit to long
 
 //ToDo - Make Waves and Splashes work
     Waves need some Rework
@@ -93,6 +93,8 @@ Shit I need to do:
     Footsteps (Also Animals & Mobs)
         Leaves
         Wet Footprint (Change Texture look & add biome color instead)
+    Rework footprints of animals
+        Make them have different amount of prints depending on the legs
 
 // Sound stuff
 
@@ -178,7 +180,7 @@ Shit that has been done sofar:
 //DONE - Make Own Wind Particle Textures
     Temp Solution used - Scaled based on Wind Type
 
-//DONE - Particle Lightnig fixed
+//DONE - Particle Lighting fixed
 
 //DONE - Make Waves and Splashes work
         It now spawns really easily, even simple water blocks against a block.
