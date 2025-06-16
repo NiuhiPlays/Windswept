@@ -17,7 +17,7 @@ public class WaterSplashParticle extends SpriteBillboardParticle {
 
     protected WaterSplashParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider,
                                   double sizeMultiplier, double heightMultiplier) {
-        super(world, x, y + 0.2, z); // Above surface
+        super(world, x, y + 1.0, z); // Above surface
         this.spriteProvider = spriteProvider;
         float sizeMultiplier1 = (float) Math.max(0.5, Math.min(2.0, sizeMultiplier));
         this.heightMultiplier = (float) Math.max(1.0, Math.min(3.0, heightMultiplier));
